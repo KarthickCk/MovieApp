@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<!-- Listener added for Standard Webcontainer Model - This will load the 
+		app modules and services -->
+	<listener>
+		<listener-class>com.zoho.sas.container.SASContextListener</listener-class>
+	</listener>
+	<!--- SAS Filters Starts -->
+	<filter>
+		<filter-name>ServerHealthCheckFilter</filter-name>
+		<filter-class>com.zoho.sas.filter.ServerHealthCheckFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>ServerHealthCheckFilter</filter-name>
+		<url-pattern>/login/servercheck.jsp</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>ServerHealthCheckFilter</filter-name>
+		<url-pattern>/_app/health</url-pattern>
+	</filter-mapping>
+
+	<!--- SAS Filters End -->
+
+	<servlet>
+		<servlet-name>RestContainer</servlet-name>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		<init-param>
+			<param-name>jersey.config.server.provider.packages</param-name>
+			<param-value>com.movieapp.rest,com.fasterxml.jackson.jaxrs.json</param-value>
+		</init-param>
+
+		<init-param>
+
+			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+
+			<param-value>true</param-value>
+
+		</init-param>
+
+		<init-param>
+			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+			<param-value>com.movieapp.rest.CORSFilter</param-value>
+		</init-param>
+
+
+		<load-on-startup>1</load-on-startup>
+
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>RestContainer</servlet-name>
+		<url-pattern>/PayrollProject/*</url-pattern>
+	</servlet-mapping>
+
+
+</web-app>

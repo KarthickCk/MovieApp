@@ -1,0 +1,485 @@
+<?xml version="1.0" ?>
+<!-- $Id$ -->
+<!DOCTYPE data-dictionary SYSTEM "data-dictionary.dtd">
+
+<data-dictionary name="MovieApp">
+	<table name="Movie">
+		<columns>
+			<column name="MOVIE_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>MOVIEID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="MOVIE_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="GENRE">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="CATEGORY">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+				<column name="CERTIFICATE">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="LANGUAGE">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="DURATION">
+				<data-type>CHAR</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="DESCRIPTION">
+				<data-type>CHAR</data-type>
+				<max-size>500</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="IMAGE_URL">
+				<data-type>CHAR</data-type>
+				<max-size>1000</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="DATE_RELEASED">
+				<data-type>CHAR</data-type>
+				<nullable>false</nullable>
+			</column>
+		</columns>
+		<primary-key name="Movie_PK">
+			<primary-key-column>MOVIE_ID</primary-key-column>
+		</primary-key>
+
+	</table>
+	
+	<table name="Screen">
+		<columns>
+			<column name="SCREEN_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>SCREENID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="SCREEN_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="SCREEN_ROWS">
+				<data-type>TINYINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="SCREEN_COLS">
+				<data-type>TINYINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Screen_PK">
+				<primary-key-column>SCREEN_ID</primary-key-column>
+			</primary-key>
+
+
+
+
+	</table>
+	
+	<table name="ShowDetail">
+		<columns>
+			<column name="SHOW_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>SHOWID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="SHOW_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+				
+			</column>
+			<column name="SHOW_START_TIME">
+				<data-type>CHAR</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="SHOW_END_TIME">
+				<data-type>CHAR</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Show_PK">
+				<primary-key-column>SHOW_ID</primary-key-column>
+			</primary-key>
+
+	</table>
+	
+	<table name="Extra">
+		<columns>
+			<column name="EXTRA_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>EXTRAID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="EXTRA_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="COST">
+				<data-type>FLOAT</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Extra_PK">
+				<primary-key-column>EXTRA_ID</primary-key-column>
+			</primary-key>
+
+	</table>
+	<table name="Customer">
+		<columns>
+			<column name="CUSTOMER_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>CUSTOMERID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="CUSTOMER_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="CUSTOMER_EMAIL">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="CUSTOMER_PHONE">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Customer_PK">
+				<primary-key-column>CUSTOMER_ID</primary-key-column>
+			</primary-key>
+
+	</table>
+	<table name="Category">
+		<columns>
+			<column name="CATEGORY_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>CATEGORYID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="CATEGORY_NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>				
+			</column>
+			<column name="CATEGORY_FARE">
+				<data-type>FLOAT</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Category_PK">
+				<primary-key-column>CATEGORY_ID</primary-key-column>
+			</primary-key>
+
+	</table>
+	
+	<table name="Seat">
+		<columns>
+			<column name="SEAT_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>SEATID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="SCREEN_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="CATEGORY_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="NAME">
+				<data-type>CHAR</data-type>
+				<max-size>150</max-size>
+				<nullable>false</nullable>
+			</column>
+			<column name="ROW_NO">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="COL_NO">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="STATUS">
+				<data-type>BOOLEAN</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="SEAT_PK">
+				<primary-key-column>SEAT_ID</primary-key-column>
+			</primary-key>
+			<foreign-keys>
+				<foreign-key name="Screen_FK" reference-table-name="Screen">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>SCREEN_ID</fk-local-column>
+							<fk-reference-column>SCREEN_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="Category_FK" reference-table-name="Category">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>CATEGORY_ID</fk-local-column>
+							<fk-reference-column>CATEGORY_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+			</foreign-keys>
+
+
+
+	</table>
+
+	<table name="MovieShow">
+		<columns>
+			<column name="MOVIE_SHOW_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>MOVIESHOWID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="SCREEN_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="SHOW_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="MOVIE_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="DATE">
+				<data-type>CHAR</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="MovieShow_PK">
+				<primary-key-column>MOVIE_SHOW_ID</primary-key-column>
+			</primary-key>
+			<foreign-keys>
+				<foreign-key name="MovieShow_FK1" reference-table-name="Screen">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>SCREEN_ID</fk-local-column>
+							<fk-reference-column>SCREEN_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="MovieShow_FK2" reference-table-name="Movie">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>MOVIE_ID</fk-local-column>
+							<fk-reference-column>MOVIE_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="MovieShow_FK3" reference-table-name="ShowDetail">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>SHOW_ID</fk-local-column>
+							<fk-reference-column>SHOW_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+			</foreign-keys>
+
+
+
+	</table>
+
+	<table name="Ticket">
+		<columns>
+			<column name="TICKET_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>SHOWSEATID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="MOVIE_SHOW_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="CUSTOMER_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="TOTAL_COST">
+				<data-type>FLOAT</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="Ticket_PK">
+				<primary-key-column>TICKET_ID</primary-key-column>
+			</primary-key>
+			<foreign-keys>
+				<foreign-key name="Ticket_FK1" reference-table-name="MovieShow">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>MOVIE_SHOW_ID</fk-local-column>
+							<fk-reference-column>MOVIE_SHOW_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="Ticket_FK2" reference-table-name="Customer">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>CUSTOMER_ID</fk-local-column>
+							<fk-reference-column>CUSTOMER_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+			</foreign-keys>
+
+
+
+	</table>
+
+	
+		<table name="ShowSeat">
+		<columns>
+			<column name="SHOW_SEAT_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>SHOWSEATID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="TICKET_ID">
+				<data-type>BIGINT</data-type>
+			</column>
+			<column name="SEAT_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="MOVIE_SHOW_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="ShowSeat_PK">
+				<primary-key-column>SHOW_SEAT_ID</primary-key-column>
+			</primary-key>
+			<foreign-keys>
+				
+				<foreign-key name="ShowSeat_FK2" reference-table-name="Seat">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>SEAT_ID</fk-local-column>
+							<fk-reference-column>SEAT_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="ShowSeat_FK3" reference-table-name="MovieShow">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>MOVIE_SHOW_ID</fk-local-column>
+							<fk-reference-column>MOVIE_SHOW_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+			</foreign-keys>
+
+
+
+	</table>
+
+		<table name="TicketCharge">
+		<columns>
+			<column name="TICKET_CHARGE_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+				<uniquevalue-generation>
+					<generator-name>TICKETCHARGEID</generator-name>
+				</uniquevalue-generation>
+			</column>
+			<column name="TICKET_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="EXTRA_ID">
+				<data-type>BIGINT</data-type>
+				<nullable>false</nullable>
+			</column>
+			<column name="QUANTITY">
+				<data-type>INTEGER</data-type>
+				<nullable>false</nullable>
+			</column>
+			</columns>
+			<primary-key name="TicketCharge_PK">
+				<primary-key-column>TICKET_CHARGE_ID</primary-key-column>
+			</primary-key>
+			<foreign-keys>
+				<foreign-key name="TicketCharge_FK1" reference-table-name="Ticket">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>TICKET_ID</fk-local-column>
+							<fk-reference-column>TICKET_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+				<foreign-key name="TicketCharge_FK2" reference-table-name="Extra">
+					<fk-columns>
+						<fk-column>
+							<fk-local-column>EXTRA_ID</fk-local-column>
+							<fk-reference-column>EXTRA_ID</fk-reference-column>
+						</fk-column>
+					</fk-columns>
+					<fk-constraints>ON-DELETE-CASCADE</fk-constraints>
+				</foreign-key>
+			</foreign-keys>
+
+
+
+	</table>
+
+	
+	
+</data-dictionary>
