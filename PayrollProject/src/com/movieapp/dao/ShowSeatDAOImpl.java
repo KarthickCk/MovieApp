@@ -2,7 +2,15 @@ package com.movieapp.dao;
 
 import java.sql.SQLException;
 
+import com.adventnet.ds.query.Column;
 import com.adventnet.ds.query.DataSet;
+import com.adventnet.ds.query.SelectQueryImpl;
+import com.adventnet.ds.query.Table;
+import com.adventnet.mfw.bean.BeanUtil;
+import com.adventnet.persistence.DataAccess;
+import com.adventnet.persistence.DataAccessException;
+import com.adventnet.persistence.DataObject;
+import com.adventnet.persistence.Persistence;
 import com.adventnet.persistence.Row;
 import com.movieapp.bean.ShowSeat;
 import com.movieapp.constants.DBConstants;
@@ -75,6 +83,29 @@ public class ShowSeatDAOImpl extends ApplicationDAO<ShowSeat>
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public int updateSeatCount(String ticketID) throws DataAccessException
+	{
+		
+		try {
+			Persistence persistence = (Persistence) BeanUtil.lookup("Persistence");
+			SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(getTableName()));
+			selectQueryImpl.setCriteria(getCriteria());
+			selectQueryImpl.addSelectColumn(Column.getColumn(getTableName(), "*"));
+			DataObject dataObject=DataAccess.get(selectQueryImpl);
+
+			Row r = dataObject.getRow(getTableName());
+			r.set(DBConstants.SS_TICKET_ID, ticketID);
+			dataObject.updateRow(r);
+			dataObject=persistence.update(dataObject);
+			return dataObject.size(getTableName());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return 0;
+		
 	}
 
 }

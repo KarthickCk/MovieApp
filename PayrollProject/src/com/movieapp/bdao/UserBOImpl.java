@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
 
 import com.adventnet.db.api.RelationalAPI;
 import com.adventnet.ds.query.Column;
@@ -477,48 +475,24 @@ public class UserBOImpl implements UserBO
 	}
 
 	@Override
-	public Properties getMovieShowProperties(Criteria criteria) 
+	public MovieShowWrapperVO getMovieShowProperties(Criteria criteria) 
 	{
 		MovieShowWrapperVO msdetails =getMovieShowListSelectQuery(criteria);
-		List<MovieShow> movieShows= msdetails.getMovieShowList();
-		List<Movie> movieList=msdetails.getMovieList();
-		List<Screen> screenList=msdetails.getScreenList();
-		List<ShowDetail> showList=msdetails.getShowList();
-		Properties movieShowProperties=new Properties();
-		movieShowProperties.put("MovieShowList", movieShows);
-		movieShowProperties.put("Movie", movieList);
-		movieShowProperties.put("Show", showList);
-		movieShowProperties.put("Screen", screenList);
-		return movieShowProperties;
+		return msdetails;
 	}
 	
 	@Override
-	public Properties getShowSeatProperties(Criteria criteria)
+	public ShowSeatWrapperVO getShowSeatProperties(Criteria criteria)
 	{
 		ShowSeatWrapperVO seatWrapperVO=getShowSeats(criteria);
-		List<ShowSeat> showSeats=seatWrapperVO.getShowSeats();
-		List<Seat> seatObjects=seatWrapperVO.getSeats();
-		List<Category> categories=seatWrapperVO.getCategories();
-		Properties showSeatProperties=new Properties();
-		showSeatProperties.put("ShowSeats", showSeats);
-		showSeatProperties.put("Seats", seatObjects);
-		showSeatProperties.put("Categories", categories);
-		return showSeatProperties;
+		return seatWrapperVO;
 	}
 
 	@Override
-	public Properties getScreenProperties(Criteria criteria) 
+	public ScreenSeatsVO getScreenProperties(Criteria criteria) 
 	{
 		ScreenSeatsVO screenSeatsVO=getScreenSeats(criteria);
-		List<Screen> screenList=screenSeatsVO.getScreens();
-		List<Seat> seatList=screenSeatsVO.getSeats();
-		List<Category> categoryList=screenSeatsVO.getCategorys();
-		Properties properties=new Properties();
-		properties.put("Screens", screenList);
-		properties.put("Seats", seatList);
-		properties.put("Categories", categoryList);
-
-		return properties;
+		return screenSeatsVO;
 	}
 	
 	private SelectQueryImpl getBookedTicketSelectQuery(Criteria criteria) 
@@ -592,25 +566,25 @@ public class UserBOImpl implements UserBO
 	}
 
 	@Override
-	public Properties getTicketProperties(Criteria criteria) 
+	public TicketWrapperVO getTicketProperties(Criteria criteria) 
 	{
 		SelectQuery selectQuery=getBookedTicketSelectQuery(criteria);
 		TicketWrapperVO ticketWrapperVO=getBookedTicketObject(selectQuery);
-		Properties properties=new Properties();
-		properties.put("Screens",ticketWrapperVO.getScreens());
-		properties.put("Seats",ticketWrapperVO.getSeats());
-		properties.put("Movies",ticketWrapperVO.getMovies());
-		properties.put("Shows",ticketWrapperVO.getShowDetails());
-		properties.put("MovieShows",ticketWrapperVO.getMovieShows());
-		properties.put("Customers",ticketWrapperVO.getCustomers());
-		properties.put("TicketCharges",ticketWrapperVO.getTicketCharges());
-		properties.put("Extras",ticketWrapperVO.getExtras());
-		properties.put("Categories",ticketWrapperVO.getCategories());
-		properties.put("Tickets",ticketWrapperVO.getTickets());
-		properties.put("TicketChargeIDs",ticketWrapperVO.getTicketChargeIDs());
-		properties.put("SeatIDs",ticketWrapperVO.getSeatIDs());
+//		Properties properties=new Properties();
+//		properties.put("Screens",ticketWrapperVO.getScreens());
+//		properties.put("Seats",ticketWrapperVO.getSeats());
+//		properties.put("Movies",ticketWrapperVO.getMovies());
+//		properties.put("Shows",ticketWrapperVO.getShowDetails());
+//		properties.put("MovieShows",ticketWrapperVO.getMovieShows());
+//		properties.put("Customers",ticketWrapperVO.getCustomers());
+//		properties.put("TicketCharges",ticketWrapperVO.getTicketCharges());
+//		properties.put("Extras",ticketWrapperVO.getExtras());
+//		properties.put("Categories",ticketWrapperVO.getCategories());
+//		properties.put("Tickets",ticketWrapperVO.getTickets());
+//		properties.put("TicketChargeIDs",ticketWrapperVO.getTicketChargeIDs());
+//		properties.put("SeatIDs",ticketWrapperVO.getSeatIDs());
 
-		return properties;
+		return ticketWrapperVO;
 	}
 	
 }

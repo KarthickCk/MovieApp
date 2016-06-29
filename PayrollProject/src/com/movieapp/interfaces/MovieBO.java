@@ -1,7 +1,6 @@
 package com.movieapp.interfaces;
 
 import java.util.List;
-import java.util.Properties;
 
 import com.movieapp.bean.Category;
 import com.movieapp.bean.Customer;
@@ -10,6 +9,7 @@ import com.movieapp.bean.Movie;
 import com.movieapp.bean.MovieShow;
 import com.movieapp.bean.Screen;
 import com.movieapp.bean.ShowDetail;
+import com.movieapp.vo.TicketWrapperVO;
 
 public interface MovieBO 
 {
@@ -41,7 +41,7 @@ public interface MovieBO
 	public Customer getCustomer(String mailID);
 
 	
-	public Properties addTicket(String ticket);
-	public Properties getBookedTicketProperties(String id);
+	public TicketWrapperVO addTicket(String ticket);
+	public TicketWrapperVO getBookedTicketProperties(String id);
 
 }

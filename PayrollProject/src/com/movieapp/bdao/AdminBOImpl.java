@@ -2,6 +2,7 @@ package com.movieapp.bdao;
 
 import java.util.ArrayList;
 
+import com.adventnet.persistence.DataAccessException;
 import com.movieapp.bean.Movie;
 import com.movieapp.bean.MovieShow;
 import com.movieapp.bean.Screen;
@@ -43,7 +44,18 @@ public class AdminBOImpl implements AdminBO
 			}
 			else if(seatID==0)
 			{
-				seatDAOImpl.insert(seat);
+				try 
+				{
+					seatDAOImpl.insert(seat);
+				} 
+				catch (DataAccessException e) 
+				{
+					e.printStackTrace();
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -60,7 +72,9 @@ public class AdminBOImpl implements AdminBO
 		{
 			screenDAOImpl.setUpdateColumn(getScreenUpdateColumns());
 			screenDAOImpl.setUpdateValue(getScreenUpdateValues(screen));
-			screenDAOImpl.update(String.valueOf(screenID));
+			String screenIDValue=String.valueOf(screenID);
+			//screenDAOImpl.retrieveWithLockID(screenIDValue);
+			screenDAOImpl.update(screenIDValue);
 			SeatDAOImpl seatDAOImpl=new SeatDAOImpl();
 			ArrayList<String> criteriaColumn=new ArrayList<>();
 			criteriaColumn.add(DBConstants.SEAT_SCREEN_ID);
@@ -69,14 +83,22 @@ public class AdminBOImpl implements AdminBO
 			seatDAOImpl.setCriteriaColumnNames(criteriaColumn);
 			seatDAOImpl.setCriteriaValues(criteriaValues);
 			seatDAOImpl.delete(null);
-			insertSeats(seats);
+			try {
+				insertSeats(seats);
+			} 
+			catch (DataAccessException e) 
+			{
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return "Screen seats are changed";
 		}
 
 		return "Screen seats not changeable";
 	}
 
-	private void insertSeats(ArrayList<Seat> seats)
+	private void insertSeats(ArrayList<Seat> seats) throws DataAccessException, Exception
 	{
 		int size=seats.size();
 		SeatDAOImpl seatDAOImpl=new SeatDAOImpl();

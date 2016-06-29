@@ -2,8 +2,8 @@ package com.movieapp.rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -31,21 +31,29 @@ import com.movieapp.bean.MovieShow;
 import com.movieapp.bean.Screen;
 import com.movieapp.bean.Seat;
 import com.movieapp.bean.ShowDetail;
+import com.movieapp.bean.ShowSeat;
 import com.movieapp.bean.Ticket;
 import com.movieapp.bean.TicketCharge;
+import com.movieapp.exception.UserException;
+import com.movieapp.vo.MovieShowWrapperVO;
+import com.movieapp.vo.ScreenSeatsVO;
+import com.movieapp.vo.ShowSeatWrapperVO;
+import com.movieapp.vo.TicketWrapperVO;
 
 @Path("/movieapp")
 public class MovieAppRestApi 
 {
 	MovieBOImpl movieBO=new MovieBOImpl();
 
-	@GET
+	@GET 		 
 	@Path("/movies")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMoviesList() 
 	{
 		List<Movie> moviesList=movieBO.getMovies();
-		return Response.ok(getJSON("movies", moviesList)).build();
+		HashMap<String, List<Movie>> movieData=new HashMap<>();
+		movieData.put("movies", moviesList);
+		return Response.ok(movieData).build();
 	}
 	
 	@DELETE
@@ -61,21 +69,24 @@ public class MovieAppRestApi
 	@Path("/movies/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMovie(@PathParam("id") String id,String data)
-	{
+	{			
+		HashMap<String, Movie> movieData=new HashMap<>();
+		movieData.put("movie", null);
 		try
 		{
 			JSONObject jsonObject=new JSONObject(data);
 			JSONObject movieObject=jsonObject.optJSONObject("movie");
 			Movie movie=(Movie) getObject(movieObject.toString(), Movie.class);
 			movie=movieBO.updateMovie(movie, id);
-			return Response.ok(getJSON("movie", movie)).build();
+			movieData.put("movie", movie);
 
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		return Response.ok(getJSON("movie", "")).build();
+
+		return Response.ok(movieData).build();
 	}
 
 	@POST
@@ -83,21 +94,23 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addMovie(String data) 
 	{
-		
+		HashMap<String, Movie> movieData=new HashMap<>();
+		movieData.put("movie", null);
+
 		try
 		{
 			JSONObject jsonObject=new JSONObject(data);
 			JSONObject movieObject=jsonObject.optJSONObject("movie");
 			Movie movie=(Movie) getObject(movieObject.toString(), Movie.class);
 			movie=movieBO.addMovie(movie);
-			return Response.ok(getJSON("movie", movie)).build();
+			movieData.put("movie", movie);
 
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		return Response.ok(getJSON("movie", "")).build();
+		return Response.ok(movieData).build();
 
 	}
 
@@ -106,9 +119,16 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMovieDetails(@PathParam("id") String id) 
 	{
+		HashMap<String, Movie> movieData=new HashMap<>();
 
-		Movie moviesList=movieBO.getMovie(id);
-		return Response.ok(getJSON("movie", moviesList)).build();
+		Movie movie=movieBO.getMovie(id);
+		movieData.put("movie", movie);
+
+		if(movie==null)
+		{
+			throw new UserException("No movie found",212);
+		}
+		return Response.ok(movieData).build();
 	}
 
 	@POST
@@ -117,7 +137,9 @@ public class MovieAppRestApi
 	public Response addScreen(String data) 
 	{
 		Screen screen=movieBO.addScreen(data);
-		return Response.ok(getJSON("screen", screen)).build();
+		HashMap<String, Screen> screenData=new HashMap<>();
+		screenData.put("screen", screen);
+		return Response.ok(screenData).build();
 	}
 
 	@GET
@@ -125,8 +147,8 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScreenDetails(@PathParam("id") String id) 
 	{
-		Properties screenProperties=movieBO.getScreenProperties(id);
-		return Response.ok(getScreenResponse(screenProperties)).build();
+		ScreenSeatsVO screenSeatsVO=movieBO.getScreenProperties(id);
+		return Response.ok(getScreenResponse(screenSeatsVO)).build();
 	}
 	
 	@PUT
@@ -149,8 +171,8 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScreenList() 
 	{
-		Properties screenProperties=movieBO.getScreenProperties(null);
-		String response=getScreenSeatResponse(screenProperties);
+		ScreenSeatsVO screenSeatsVO=movieBO.getScreenProperties(null);
+		String response=getScreenSeatResponse(screenSeatsVO);
 		return Response.ok(response).build();
 	}
 	
@@ -169,7 +191,9 @@ public class MovieAppRestApi
 	public Response addMovieShows(String data) 
 	{
 		MovieShow movieShow=movieBO.addMovieshow(data);
-		return Response.ok(getJSON("movieshow", movieShow)).build();
+		HashMap<String, MovieShow> movieShowData=new HashMap<>();
+		movieShowData.put("movieshow", movieShow);
+		return Response.ok(movieShowData).build();
 	}
 	
 	@PUT
@@ -177,21 +201,22 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMovieShows(@PathParam("id")String id,String data) 
 	{
+		HashMap<String, MovieShow> movieShowData=new HashMap<>();
+		movieShowData.put("movieshow", null);
+
 		try
 		{
 			JSONObject jsonObject=new JSONObject(data);
 			JSONObject movieShowObject=jsonObject.optJSONObject("movieshow");
 			MovieShow movieShow=(MovieShow) getObject(movieShowObject.toString(), MovieShow.class);
 			movieShow=movieBO.updateMovieShow(movieShow,id);
-			return Response.ok(getJSON("movieshow", movieShow)).build();
-
+			movieShowData.put("movieshow", movieShow);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		return Response.ok(getJSON("movieshow", "")).build();
-
+		return Response.ok(movieShowData).build();
 	}
 
 	@GET
@@ -218,8 +243,8 @@ public class MovieAppRestApi
 			values.add(screen);
 		}
 
-		Properties movieShowProperties=movieBO.getMovieShowProperties(columns,values);
-		String response=getMovieShowResponse(movieShowProperties);
+		MovieShowWrapperVO movieShowWrapperVO=movieBO.getMovieShowProperties(columns,values);
+		String response=getMovieShowResponse(movieShowWrapperVO);
 		return Response.ok(response).build();
 	}
 
@@ -242,8 +267,8 @@ public class MovieAppRestApi
 		columns.add("id");
 		values.add(id);
 
-		Properties movieShow=movieBO.getMovieShowDetails(columns,values);
-		return Response.ok(getMovieShow(movieShow)).build();
+		MovieShowWrapperVO movieShowWrapperVO=movieBO.getMovieShowDetails(columns,values);
+		return Response.ok(getMovieShow(movieShowWrapperVO)).build();
 	}
 
 	@GET
@@ -252,7 +277,9 @@ public class MovieAppRestApi
 	public Response getShowList() 
 	{
 		List<ShowDetail> showList=movieBO.getShows();
-		return Response.ok(getJSON("shows", showList)).build();
+		HashMap<String, List<ShowDetail>> showDetail=new HashMap<>();
+		showDetail.put("shows", showList);
+		return Response.ok(showDetail).build();
 	}
 
 	@POST
@@ -261,7 +288,9 @@ public class MovieAppRestApi
 	public Response addShow(@QueryParam("data") String data) 
 	{
 		ShowDetail showDetail=movieBO.addShow(null);
-		return Response.ok(getJSON("show", showDetail)).build();
+		HashMap<String, ShowDetail> showData=new HashMap<>();
+		showData.put("show", showDetail);
+		return Response.ok(showData).build();
 	}
 
 	@DELETE
@@ -279,7 +308,9 @@ public class MovieAppRestApi
 	public Response getShowDetails(@PathParam("id") String id) 
 	{
 		ShowDetail showDetails=movieBO.getShow(id);
-		return Response.ok(getJSON("show", showDetails)).build();
+		HashMap<String, ShowDetail> showData=new HashMap<>();
+		showData.put("show", showDetails);
+		return Response.ok(showData).build();
 	}
 	
 	@GET
@@ -288,7 +319,9 @@ public class MovieAppRestApi
 	public Response getCategory(@PathParam("id") String id) 
 	{
 		Category category=movieBO.getCategory(id);
-		return Response.ok(getJSON("category", category)).build();
+		HashMap<String, Category> categoryData=new HashMap<>();
+		categoryData.put("category", category);
+		return Response.ok(categoryData).build();
 	}
 
 	@POST
@@ -297,7 +330,9 @@ public class MovieAppRestApi
 	public Response addCategory(@QueryParam("data") String data) 
 	{
 		Category category=movieBO.addCategory(null);
-		return Response.ok(getJSON("category", category)).build();
+		HashMap<String, Category> categoryData=new HashMap<>();
+		categoryData.put("category", category);
+		return Response.ok(categoryData).build();
 	}
 
 	@GET
@@ -314,8 +349,8 @@ public class MovieAppRestApi
 			values.add(movieShowID);
 		}
 
-		Properties showSeatProperties=movieBO.getShowSeatProperties(columns,values);
-		String showSeatResponse=getShowSeatResponse(showSeatProperties);
+		ShowSeatWrapperVO showSeatWrapperVO=movieBO.getShowSeatProperties(columns,values);
+		String showSeatResponse=getShowSeatResponse(showSeatWrapperVO);
 		return Response.ok(showSeatResponse).build();
 	}
 	
@@ -325,7 +360,9 @@ public class MovieAppRestApi
 	public Response getExtras() 
 	{
 		List<Extra> extraList=movieBO.getExtras();
-		return Response.ok(getJSON("extras", extraList)).build();
+		HashMap<String, List<Extra>> extraData=new HashMap<>();
+		extraData.put("extras", extraList);
+		return Response.ok(extraData).build();
 	}
 	
 	@POST
@@ -335,7 +372,9 @@ public class MovieAppRestApi
 	{
 		//Extra screen=(Extra) getObject(data, Extra.class);
 		Extra extra=movieBO.addExtra(null);
-		return Response.ok(getJSON("extra", extra)).build();
+		HashMap<String, Extra> extraData=new HashMap<>();
+		extraData.put("extra", extra);
+		return Response.ok(extraData).build();
 	}
 	
 	@POST
@@ -343,20 +382,21 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addCustomer(String data) 
 	{
-		
+		HashMap<String, Customer> customerData=new  HashMap<>();
+		customerData.put("customer", null);
 		try
 		{
 			JSONObject jsonObject=new JSONObject(data);
 			JSONObject customerObject=jsonObject.optJSONObject("customer");
 			Customer customer=(Customer)getObject(customerObject.toString(), Customer.class);
 			customer=movieBO.addCustomer(customer);
-			return Response.ok(getJSON("customer", customer)).build();
+			customerData.put("customer", customer);
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
 		}
-		return Response.ok("").build();
+		return Response.ok(customerData).build();
 		
 	}
 	
@@ -367,8 +407,21 @@ public class MovieAppRestApi
 	{
 		Customer customer=movieBO.getCustomer(emailID);
 		ArrayList<Customer> customers=new ArrayList<>();
+		if(customers.size()==0)
+		{
+			try 
+			{
+				throw new UserException("No user found",0);
+			} 
+			catch (UserException e) 
+			{
+				e.printStackTrace();
+			}
+		}
 		customers.add(customer);
-		return Response.ok(getJSON("customers", customers)).build();		
+		HashMap<String, ArrayList<Customer>> customerData=new  HashMap<>();
+		customerData.put("customer", customers);
+		return Response.ok(customerData).build();		
 	}
 	
 	@POST
@@ -377,8 +430,8 @@ public class MovieAppRestApi
 	public Response addTicket(@QueryParam("action") String action,String data) 
 	{
 		String ticket=getBeanJSON(data, "ticket");
-		Properties properties=movieBO.addTicket(ticket);
-		return Response.ok(getBookedTicketResponse(properties)).build();
+		TicketWrapperVO ticketWrapperVO=movieBO.addTicket(ticket);
+		return Response.ok(getBookedTicketResponse(ticketWrapperVO)).build();
 	}
 	
 	@GET
@@ -386,18 +439,18 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTicketDetails(@PathParam("id") String id) 
 	{
-		Properties properties=movieBO.getBookedTicketProperties(id);
-		return Response.ok(getBookedTicketResponse(properties)).build();
+		TicketWrapperVO ticketWrapperVO=movieBO.getBookedTicketProperties(id);
+		return Response.ok(getBookedTicketResponse(ticketWrapperVO)).build();
 	}
 
-	private String getMovieShowResponse(Properties movieShowProperties)
+	private String getMovieShowResponse(MovieShowWrapperVO movieShowWrapperVO)
 	{
 		try
 		{
-			List<MovieShow> movieShows=(List<MovieShow>) movieShowProperties.get("MovieShowList");
-			List<Movie> movieList=(List<Movie>) movieShowProperties.get("Movie");
-			List<Screen> screenList=(List<Screen>) movieShowProperties.get("Screen");
-			List<ShowDetail> showList=(List<ShowDetail>) movieShowProperties.get("Show");
+			List<MovieShow> movieShows=movieShowWrapperVO.getMovieShowList();
+			List<Movie> movieList=movieShowWrapperVO.getMovieList();
+			List<Screen> screenList=movieShowWrapperVO.getScreenList();
+			List<ShowDetail> showList=movieShowWrapperVO.getShowList();
 
 			ObjectMapper objectMapper=new ObjectMapper();
 			String movieShowData=objectMapper.writer().withRootName("movieshows").writeValueAsString(movieShows);
@@ -423,14 +476,14 @@ public class MovieAppRestApi
 		return null;
 	}
 	
-	private String getMovieShow(Properties movieShowProperties)
+	private String getMovieShow(MovieShowWrapperVO movieShowWrapperVO)
 	{
 		try
 		{
-			List<MovieShow> movieShows=(List<MovieShow>) movieShowProperties.get("MovieShowList");
-			List<Movie> movieList=(List<Movie>) movieShowProperties.get("Movie");
-			List<Screen> screenList=(List<Screen>) movieShowProperties.get("Screen");
-			List<ShowDetail> showList=(List<ShowDetail>) movieShowProperties.get("Show");
+			List<MovieShow> movieShows=movieShowWrapperVO.getMovieShowList();
+			List<Movie> movieList=movieShowWrapperVO.getMovieList();
+			List<Screen> screenList=movieShowWrapperVO.getScreenList();
+			List<ShowDetail> showList=movieShowWrapperVO.getShowList();
 
 			ObjectMapper objectMapper=new ObjectMapper();
 			String movieShowData=objectMapper.writer().withRootName("movieshows").writeValueAsString(movieShows.get(0));
@@ -456,13 +509,13 @@ public class MovieAppRestApi
 		return null;
 	}
 
-	private String getShowSeatResponse(Properties showSeatProperties)
+	private String getShowSeatResponse(ShowSeatWrapperVO showSeatWrapperVO)
 	{
 		try
 		{
-			List<MovieShow> showSeats=(List<MovieShow>) showSeatProperties.get("ShowSeats");
-			List<Movie> seatLists=(List<Movie>) showSeatProperties.get("Seats");
-			List<Category> categories=(List<Category>) showSeatProperties.get("Categories");
+			List<ShowSeat> showSeats=showSeatWrapperVO.getShowSeats();
+			List<Seat> seatLists=showSeatWrapperVO.getSeats();
+			List<Category> categories=(List<Category>) showSeatWrapperVO.getCategories();
 
 			ObjectMapper objectMapper=new ObjectMapper();
 			String showSeatData=objectMapper.writer().withRootName("showseats").writeValueAsString(showSeats);
@@ -486,11 +539,11 @@ public class MovieAppRestApi
 		return null;
 	}
 
-	private String getScreenSeatResponse(Properties showSeatProperties)
+	private String getScreenSeatResponse(ScreenSeatsVO screenSeatsVO)
 	{
-		List<Screen> screenList=(List<Screen>) showSeatProperties.get("Screens");
-		List<Seat> seatLists=(List<Seat>) showSeatProperties.get("Seats");
-		List<Category> categoryList=(List<Category>) showSeatProperties.get("Categories");
+		List<Screen> screenList=screenSeatsVO.getScreens();
+		List<Seat> seatLists=screenSeatsVO.getSeats();
+		List<Category> categoryList=screenSeatsVO.getCategorys();
 
 		String screenData=getJSON("screens", screenList);
 		String seatData=getJSON("seats", seatLists);
@@ -504,15 +557,19 @@ public class MovieAppRestApi
 		return data;
 	}
 	
-	private String getScreenResponse(Properties screenProperties)
+	private String getScreenResponse(ScreenSeatsVO screenSeatsVO)
 	{
-		List<Screen> screenList=(List<Screen>) screenProperties.get("Screens");
-		List<Seat> seatLists=(List<Seat>) screenProperties.get("Seats");
-		List<Category> categoryList=(List<Category>) screenProperties.get("Categories");
+		List<Screen> screenList=screenSeatsVO.getScreens();
+		List<Seat> seatLists=screenSeatsVO.getSeats();
+		List<Category> categoryList=screenSeatsVO.getCategorys();
 		Screen screen=new Screen();
 		if(screenList.size()>0)
 		{
 			screen=screenList.get(0);
+		}
+		else
+		{
+			throw new UserException("No screen found",212);
 		}
 		
 		String screenData=getJSON("screens", screen);
@@ -527,20 +584,20 @@ public class MovieAppRestApi
 		return data;
 	}
 	
-	private String getBookedTicketResponse(Properties showSeatProperties)
+	private String getBookedTicketResponse(TicketWrapperVO ticketWrapperVO)
 	{
-		List<Screen> screenList=(List<Screen>) showSeatProperties.get("Screens");
-		List<Seat> seatLists=(List<Seat>) showSeatProperties.get("Seats");
-		List<Movie> movieLists=(List<Movie>) showSeatProperties.get("Movies");
-		List<ShowDetail> showLists=(List<ShowDetail>) showSeatProperties.get("Shows");
-		List<MovieShow> movieShows=(List<MovieShow>) showSeatProperties.get("MovieShows");
-		List<Customer> customers=(List<Customer>) showSeatProperties.get("Customers");
-		List<TicketCharge> ticketCharges=(List<TicketCharge>) showSeatProperties.get("TicketCharges");
-		List<Extra> extras=(List<Extra>) showSeatProperties.get("Extras");
-		List<Category> categories=(List<Category>) showSeatProperties.get("Categories");
-		List<Ticket> tickets=(List<Ticket>) showSeatProperties.get("Tickets");
-		List<Long> ticketChargeIds=(List<Long>) showSeatProperties.get("TicketChargeIDs");
-		List<Long> seatIds=(List<Long>) showSeatProperties.get("SeatIDs");
+		List<Screen> screenList=ticketWrapperVO.getScreens();
+		List<Seat> seatLists=ticketWrapperVO.getSeats();
+		List<Movie> movieLists=ticketWrapperVO.getMovies();
+		List<ShowDetail> showLists=ticketWrapperVO.getShowDetails();
+		List<MovieShow> movieShows=ticketWrapperVO.getMovieShows();
+		List<Customer> customers=ticketWrapperVO.getCustomers();
+		List<TicketCharge> ticketCharges=ticketWrapperVO.getTicketCharges();
+		List<Extra> extras=ticketWrapperVO.getExtras();
+		List<Category> categories=ticketWrapperVO.getCategories();
+		List<Ticket> tickets=ticketWrapperVO.getTickets();
+		List<Long> ticketChargeIds=ticketWrapperVO.getTicketChargeIDs();
+		List<Long> seatIds=ticketWrapperVO.getSeatIDs();
 
 		String screenData=getJSON("screens", screenList);
 		String seatData=getJSON("seats", seatLists);

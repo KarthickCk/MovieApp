@@ -104,5 +104,23 @@ public class ScreenDAOImpl extends ApplicationDAO<Screen>
 		
 		return true;
 	}
+	
+	public boolean isToAddScreen(String screenName) 
+	{
+		String tableName=getTableName();
+		SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(tableName));
+		ArrayList<Column> columns=new ArrayList<>();
+		Criteria criteria=new Criteria(Column.getColumn(tableName, DBConstants.SCREEN_NAME), screenName, QueryConstants.EQUAL);
+		columns.add(Column.getColumn(tableName, DBConstants.SCREEN_ID));
+		selectQueryImpl.addSelectColumns(columns);
+		selectQueryImpl.setCriteria(criteria);
+		Row row=getRow(selectQueryImpl,tableName);
+		if(row!=null)
+		{
+			return false;
+		}
+		
+		return true;
+	}
 
 }

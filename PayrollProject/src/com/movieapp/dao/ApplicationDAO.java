@@ -35,19 +35,19 @@ public abstract class ApplicationDAO <T>
 	public ArrayList<String> getUpdateColumn() {
 		return updateColumn;
 	}
-	
+
 	public void setUpdateColumn(ArrayList<String> updateColumn) {
 		this.updateColumn = updateColumn;
 	}
-	
+
 	public ArrayList<Object> getUpdateValue() {
 		return updateValue;
 	}
-	
+
 	public void setUpdateValue(ArrayList<Object> updateValue) {
 		this.updateValue = updateValue;
 	}
-	
+
 	public abstract String getTableName();
 	public abstract T getAsBean(Row row);
 	public abstract T getAsBean(DataSet dataSet);
@@ -55,36 +55,25 @@ public abstract class ApplicationDAO <T>
 	public abstract Row getAsRow(T data);
 	public abstract String  getIDColumnName();
 
-	public  T insert(T data)
+	public  T insert(T data) throws DataAccessException,Exception
 	{
-		try 
-		{
-			Persistence persistence = (Persistence) BeanUtil.lookup("Persistence");
-			DataObject dataObject = DataAccess.constructDataObject();
-			Row rowsToInsert=getAsRow(data);
-			dataObject.addRow(rowsToInsert);
-			persistence.add(dataObject);
-			Iterator<Row> iterator=dataObject.getRows(getTableName());
-			while(iterator.hasNext())
-			{
-				Row row=iterator.next();
-				long id=(long) row.get(getIDColumnName());
-				return retrieveWithID(String.valueOf(id));
-			}
 
-		} 
-		catch (DataAccessException e) 
+		Persistence persistence = (Persistence) BeanUtil.lookup("Persistence");
+		DataObject dataObject = DataAccess.constructDataObject();
+		Row rowsToInsert=getAsRow(data);
+		dataObject.addRow(rowsToInsert);
+		persistence.add(dataObject);
+		Iterator<Row> iterator=dataObject.getRows(getTableName());
+		while(iterator.hasNext())
 		{
-			e.printStackTrace();
+			Row row=iterator.next();
+			long id=(long) row.get(getIDColumnName());
+			return retrieveWithID(String.valueOf(id));
 		}
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		} 
 		return data;
 	}
-	
-	public  T update(String id)
+
+	public  T update(String id)  
 	{
 		try 
 		{
@@ -145,7 +134,7 @@ public abstract class ApplicationDAO <T>
 
 		return null; 
 	}
-	
+
 	public  T retrieveWithCriteria()
 	{ 
 		Persistence persist;
@@ -367,5 +356,28 @@ public abstract class ApplicationDAO <T>
 		}
 		return null;
 
+	}
+
+	public  T retrieveWithLockID(String condition)
+	{ 
+		Persistence persist;
+		try 
+		{
+			SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(getTableName()));
+			selectQueryImpl.setLock(true);
+			Criteria criteria=new Criteria(new Column(getTableName(), getIDColumnName()),condition,QueryConstants.EQUAL);
+			persist = (Persistence) BeanUtil.lookup("Persistence");
+			DataObject dataObject = persist.get(selectQueryImpl);
+			selectQueryImpl.setCriteria(criteria);
+			Row row = dataObject.getRow(getTableName());
+			T data=getAsBean(row);
+			return data;
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+
+		return null; 
 	}
 }

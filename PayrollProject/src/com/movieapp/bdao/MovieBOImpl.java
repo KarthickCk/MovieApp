@@ -2,12 +2,16 @@ package com.movieapp.bdao;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+
+import javax.transaction.SystemException;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.adventnet.ds.query.Criteria;
+import com.adventnet.persistence.DataAccess;
+import com.adventnet.persistence.DataAccessException;
 import com.movieapp.bean.Category;
 import com.movieapp.bean.Customer;
 import com.movieapp.bean.Extra;
@@ -28,22 +32,27 @@ import com.movieapp.dao.SeatDAOImpl;
 import com.movieapp.dao.ShowSeatDAOImpl;
 import com.movieapp.dao.ShowsDAOImpl;
 import com.movieapp.dao.TicketDAOImpl;
+import com.movieapp.exception.UserException;
 import com.movieapp.factory.MovieDAOFactory;
 import com.movieapp.interfaces.MovieBO;
 import com.movieapp.util.MovieAppUtil;
+import com.movieapp.vo.MovieShowWrapperVO;
+import com.movieapp.vo.ScreenSeatsVO;
+import com.movieapp.vo.ShowSeatWrapperVO;
+import com.movieapp.vo.TicketWrapperVO;
 
 public class MovieBOImpl implements MovieBO
 {
 	MovieAppUtil movieAppUtil=MovieAppUtil.INSTANCES;
 
-	public Properties getMovieShowDetails(ArrayList<String> columns,ArrayList<String> values)
+	public MovieShowWrapperVO getMovieShowDetails(ArrayList<String> columns,ArrayList<String> values)
 	{
 		UserBOImpl userBO=new UserBOImpl();
 		Criteria criteria=movieAppUtil.getCriteria(MovieShowDAOImpl.TABLE_NAME, getMovieShowsColumnsToFilter(columns), values);
 		return userBO.getMovieShowProperties(criteria);
 	}
 
-	public Properties getScreenProperties(String id)
+	public ScreenSeatsVO getScreenProperties(String id)
 	{
 		UserBOImpl userBO=new UserBOImpl();
 		Criteria criteria=null;
@@ -71,7 +80,7 @@ public class MovieBOImpl implements MovieBO
 		return seatIDs;
 	}
 
-	private void addShowSeats(long screenID,long movieShowID)
+	private void addShowSeats(long screenID,long movieShowID) throws DataAccessException, Exception
 	{
 		List<Long> showSeats=getSeatIDs(screenID);
 		int size=showSeats.size();
@@ -82,21 +91,21 @@ public class MovieBOImpl implements MovieBO
 		}
 	}
 
-	public Properties getMovieShowProperties(ArrayList<String> columns,ArrayList<String> values)
+	public MovieShowWrapperVO getMovieShowProperties(ArrayList<String> columns,ArrayList<String> values)
 	{
 		UserBOImpl userBO=new UserBOImpl();
 		Criteria criteria=movieAppUtil.getCriteria(MovieShowDAOImpl.TABLE_NAME, getMovieShowsColumnsToFilter(columns), values);
 		return userBO.getMovieShowProperties(criteria);
 	}
 
-	public Properties getShowSeatProperties(ArrayList<String> columns,ArrayList<String> values)
+	public ShowSeatWrapperVO getShowSeatProperties(ArrayList<String> columns,ArrayList<String> values)
 	{
 		UserBOImpl userBO=new UserBOImpl();
 		Criteria criteria=movieAppUtil.getCriteria(ShowSeatDAOImpl.TABLE_NAME, getShowSeatsColumnsToFilter(columns), values);
 		return userBO.getShowSeatProperties(criteria);
 	}
 
-	public void addSeat(Seat seat)
+	public void addSeat(Seat seat) throws DataAccessException, Exception
 	{
 		MovieDAOFactory.getSeatDAO().insert(seat);
 	}
@@ -185,7 +194,7 @@ public class MovieBOImpl implements MovieBO
 		Customer customer=new Customer();
 		customer.setName("Karthick");
 		customer.setPhoneNumber("9790198648");
-		customer.setEmail("karthickck0@gmail.com");
+		customer.setEmail("admin@zohocorp.com");
 		return customer;
 	}
 
@@ -290,8 +299,17 @@ public class MovieBOImpl implements MovieBO
 	@Override
 	public Movie addMovie(Movie movie) 
 	{
-		Movie movieData=MovieDAOFactory.getMovieDAO().insert(movie);
-		return movieData;
+		Movie movieData;
+		try 
+		{
+			movieData = MovieDAOFactory.getMovieDAO().insert(movie);
+			return movieData;
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return movie;
 	}
 
 	@Override
@@ -303,8 +321,21 @@ public class MovieBOImpl implements MovieBO
 	@Override
 	public ShowDetail addShow(ShowDetail showDetail) 
 	{
-		ShowDetail showData=MovieDAOFactory.getShowDAO().insert(getShowDetail());
-		return showData;
+		ShowDetail showData;
+		try 
+		{
+			showData = MovieDAOFactory.getShowDAO().insert(getShowDetail());
+			return showData;
+		} 
+		catch (DataAccessException e) 
+		{
+			e.printStackTrace();
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return showDetail;
 	}
 
 	@Override
@@ -316,6 +347,10 @@ public class MovieBOImpl implements MovieBO
 		{
 			//ShowsDAOImpl.delete(showID);
 			responseMessage="Deleted successfully";
+		}
+		else
+		{
+			throw new UserException(responseMessage,1002);
 		}
 		return responseMessage; 
 	}
@@ -329,10 +364,31 @@ public class MovieBOImpl implements MovieBO
 	@Override
 	public Screen addScreen(String screenData) 
 	{
+		ScreenDAOImpl screenDAOImpl=new ScreenDAOImpl();
 		Screen screen=getScreenObject(screenData);
-		screen=MovieDAOFactory.getScreenDAO().insert(screen);
-		ArrayList<Seat> seats=getSeats(screenData, screen.getID());
-		insertSeats(seats);
+		String screenName=screen.getScreenName();
+		if(!screenDAOImpl.isToAddScreen(screenName))
+		{
+			throw new UserException("Screen name already present", 1001);
+		}
+		try 
+		{
+			DataAccess.getTransactionManager().begin();
+			screen=MovieDAOFactory.getScreenDAO().insert(screen);
+			ArrayList<Seat> seats=getSeats(screenData, screen.getID());
+			insertSeats(seats);
+			DataAccess.getTransactionManager().commit();
+		} 
+		catch (DataAccessException e) 
+		{
+			rollBack();
+			throw new UserException("Error while adding screen");
+		} catch (Exception e) 
+		{
+			rollBack();
+			throw new UserException("Error while adding screen");
+		}
+		
 		return screen;
 	}
 
@@ -345,6 +401,10 @@ public class MovieBOImpl implements MovieBO
 		{
 			screenDAOImpl.delete(screenID);
 			responseMessage="Deleted successfully";
+		}
+		else
+		{
+			throw new UserException(responseMessage, 1001);
 		}
 		return responseMessage; 
 	}
@@ -372,14 +432,31 @@ public class MovieBOImpl implements MovieBO
 			movieShowDAOImpl.delete(id);
 			responseMessage="Deleted successfully";
 		}
+		else
+		{
+			throw new UserException(responseMessage, 1001);
+		}
 		return responseMessage;
 	}
 
 	@Override
 	public Category addCategory(Category category) 
 	{
-		Category categoryData=MovieDAOFactory.getCategoryDAO().insert(getCategory());
-		return categoryData;
+		Category categoryData;
+		try 
+		{
+			categoryData = MovieDAOFactory.getCategoryDAO().insert(getCategory());
+			return categoryData;
+		} 
+		catch (DataAccessException e) 
+		{
+			e.printStackTrace();
+		}
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return category;
 	}
 
 	@Override
@@ -403,57 +480,97 @@ public class MovieBOImpl implements MovieBO
 	@Override
 	public Extra addExtra(Extra extra) 
 	{
-		Extra extraData=MovieDAOFactory.getExtasDAO().insert(getExtra());
-		return extraData;
+		Extra extraData;
+		try 
+		{
+			extraData = MovieDAOFactory.getExtasDAO().insert(getExtra());
+			return extraData;
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return extra;
 	}
 
 	@Override
 	public Customer addCustomer(Customer customer) 
 	{
-		Customer customerData=MovieDAOFactory.getCustomerDAO().insert(customer);
-		return customerData;	
-	}
-
-	@Override
-	public Properties addTicket(String ticket) 
-	{
-		Ticket ticketData=MovieDAOFactory.getTicketDAO().insert(getTicket(ticket));
-		long ticketID=ticketData.getId();
-		updateSeatID(ticket, ticketID);
-		addTicketCharge(ticket, ticketID);
-		return getBookedTicketProperties(String.valueOf(ticketID));
-	}
-
-	private void updateSeatID(String ticket,long ticketID)
-	{
-		try
+		Customer customerData;
+		try 
 		{
-			JSONObject ticketObject=new JSONObject(ticket);
-			JSONArray seats=ticketObject.optJSONArray("showseats");
-			int length=seats.length();
-			ShowSeatDAOImpl seatDAOImpl=new ShowSeatDAOImpl();
-			ArrayList<String> updateColumns=new ArrayList<>();
-			updateColumns.add(DBConstants.SS_TICKET_ID);
-			ArrayList<Object> updateValues=new ArrayList<>();
-			updateValues.add(ticketID);
-			seatDAOImpl.setUpdateColumn(updateColumns);
-			seatDAOImpl.setUpdateValue(updateValues);
-			ArrayList<String> criteriaColumns=new ArrayList<>();
-			criteriaColumns.add(DBConstants.SHOW_SEAT_ID);
-
-			for(int i=0;i<length;i++)
-			{
-				ArrayList<String> criteriaValues=new ArrayList<>();
-				String seatID=seats.optString(i);
-				criteriaValues.add(seats.optString(i));
-				seatDAOImpl.update(seatID);
-			}
-
-		}
-		catch(Exception e)
+			customerData = MovieDAOFactory.getCustomerDAO().insert(customer);
+			return customerData;
+		} 
+		catch (Exception e) 
 		{
 			e.printStackTrace();
 		}
+		return customer;	
+	}
+
+	@Override
+	public TicketWrapperVO addTicket(String ticket) 
+	{
+		long ticketID=0;
+		try 
+		{
+			DataAccess.getTransactionManager().begin();
+			Ticket ticketData=MovieDAOFactory.getTicketDAO().insert(getTicket(ticket));
+			ticketID=ticketData.getId();
+			updateSeatID(ticket, ticketID);
+			addTicketCharge(ticket, ticketID);
+			DataAccess.getTransactionManager().commit();
+		} 
+		catch (Exception e) 
+		{
+			rollBack();
+			throw new UserException("Ticket not booked");
+		}
+		
+		return getBookedTicketProperties(String.valueOf(ticketID));
+	}
+	
+	private void rollBack()
+	{
+		try {
+			DataAccess.getTransactionManager().rollback();
+		} catch (IllegalStateException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SecurityException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (SystemException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	}
+
+	private void updateSeatID(String ticket,long ticketID) throws UserException, JSONException, DataAccessException
+	{
+
+		JSONObject ticketObject=new JSONObject(ticket);
+		JSONArray seats=ticketObject.optJSONArray("showseats");
+		int length=seats.length();
+		ShowSeatDAOImpl seatDAOImpl=new ShowSeatDAOImpl();
+		ArrayList<String> criteriaColumns=new ArrayList<>();
+		criteriaColumns.add(DBConstants.SHOW_SEAT_ID);
+		criteriaColumns.add(DBConstants.SS_TICKET_ID);
+		seatDAOImpl.setCriteriaColumnNames(criteriaColumns);
+		for(int i=0;i<length;i++)
+		{
+			ArrayList<String> criteriaValues=new ArrayList<>();
+			criteriaValues.add(seats.optString(i));
+			criteriaValues.add("0");
+			seatDAOImpl.setCriteriaValues(criteriaValues);
+			int count=seatDAOImpl.updateSeatCount(String.valueOf(ticketID));
+			if(count==0)
+			{
+				throw new UserException("Ticket already booked");
+			}
+		}
+
 	}
 
 	private void addTicketCharge(String data,long ticketID)
@@ -477,7 +594,7 @@ public class MovieBOImpl implements MovieBO
 	}
 
 	@Override
-	public Properties getBookedTicketProperties(String id) 
+	public TicketWrapperVO getBookedTicketProperties(String id) 
 	{
 		UserBOImpl userBOImpl=new UserBOImpl();
 		ArrayList<String> columns=new ArrayList<>();
@@ -487,8 +604,7 @@ public class MovieBOImpl implements MovieBO
 		Criteria criteria=movieAppUtil.getCriteria(TicketDAOImpl.TABLE_NAME,columns, values);
 		Criteria showSeatCriteria=movieAppUtil.getCriteria(ShowSeatDAOImpl.TABLE_NAME,columns, values);
 		criteria=criteria.and(showSeatCriteria);
-		Properties properties=userBOImpl.getTicketProperties(criteria);		
-		return properties;
+		return userBOImpl.getTicketProperties(criteria);
 	}
 
 	public String updateScreenLayout(String screenData,boolean isChangeLayout)
@@ -518,7 +634,9 @@ public class MovieBOImpl implements MovieBO
 		{
 			e.printStackTrace();
 		}
+
 		return null;
+
 	}
 
 	private ArrayList<Seat> getSeats(String screenData,long screenId)
@@ -548,7 +666,7 @@ public class MovieBOImpl implements MovieBO
 		return seats;
 	}
 
-	private void insertSeats(ArrayList<Seat> seats)
+	private void insertSeats(ArrayList<Seat> seats) throws DataAccessException, Exception
 	{
 		int size=seats.size();
 		SeatDAOImpl seatDAOImpl=new SeatDAOImpl();
@@ -562,7 +680,7 @@ public class MovieBOImpl implements MovieBO
 	private void addMovieShows(String data)
 	{
 		MovieShowDAOImpl movieShowDAOImpl=new MovieShowDAOImpl();
-		
+
 		try
 		{
 			JSONObject movieShowsObject=new JSONObject(data);
@@ -620,9 +738,14 @@ public class MovieBOImpl implements MovieBO
 			movieDAOImpl.delete(id);
 			responseMessage="Deleted successfully";
 		}
+		else
+		{
+			throw new UserException(responseMessage,1002);
+		}
+
 		return responseMessage;
 	}
-	
+
 	public Movie updateMovie(Movie movie,String movieID)
 	{
 		AdminBOImpl  adminBOImpl=new AdminBOImpl();
