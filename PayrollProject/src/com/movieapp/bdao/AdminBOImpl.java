@@ -25,6 +25,9 @@ public class AdminBOImpl implements AdminBO
 		ScreenDAOImpl screenDAOImpl=new ScreenDAOImpl();
 		screenDAOImpl.setUpdateColumn(getScreenUpdateColumns());
 		screenDAOImpl.setUpdateValue(getScreenUpdateValues(screen));
+		String screenId=String.valueOf(screen.getID());
+		screenDAOImpl.update(screenId);
+
 		int size=seats.size();
 		for(int i=0;i<size;i++)	
 		{
@@ -185,7 +188,7 @@ public class AdminBOImpl implements AdminBO
 		//updateColumns.add(movieShow.getID());
 		updateColumns.add((String)screen.getScreenName());
 		updateColumns.add((long)screen.getScreenRows());
-		updateColumns.add((long)screen.getScreenRows());
+		updateColumns.add((long)screen.getScreenColumns());
 		
 		return updateColumns;
 	}

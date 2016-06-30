@@ -104,6 +104,14 @@ public class TicketWrapperVO
 	public void setMovies(ArrayList<Movie> movies) {
 		this.movies = movies;
 	}
+
+	@Override
+	public String toString() {
+		return "TicketWrapperVO [seats=" + seats + ", categories=" + categories + ", ticketCharges=" + ticketCharges
+				+ ", extras=" + extras + ", customers=" + customers + ", movieShows=" + movieShows + ", screens="
+				+ screens + ", showDetails=" + showDetails + ", movies=" + movies + ", ticketChargeIDs="
+				+ ticketChargeIDs + ", tickets=" + tickets + ", seatIDs=" + seatIDs + "]";
+	}
 	
 	
 }

@@ -38,4 +38,10 @@ public class ScreenSeatsVO
 	{
 		this.seats = seats;
 	}
+
+	@Override
+	public String toString() {
+		return "ScreenSeatsVO [screens=" + screens + ", seats=" + seats + ", categorys=" + categorys + "]";
+	}
+	
 }

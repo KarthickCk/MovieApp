@@ -30,4 +30,11 @@ public class Ticket {
 	public void setTotalCost(float totalCost) {
 		this.totalCost = totalCost;
 	}
+	
+	@Override
+	public String toString() {
+		return "Ticket [id=" + id + ", movieShowID=" + movieShowID + ", customerID=" + customerID + ", totalCost="
+				+ totalCost + "]";
+	}
+	
 }

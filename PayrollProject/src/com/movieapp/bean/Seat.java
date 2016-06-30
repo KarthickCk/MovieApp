@@ -26,8 +26,6 @@ public class Seat
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	
 	
 	public void setId(long id) {
 		this.id = id;
@@ -75,6 +73,13 @@ public class Seat
 	
 	public boolean getStatus() {
 		return status;
+	}
+
+	@Override
+	public String toString() {
+		return "Seat [id=" + id + ", screenID=" + screenID + ", categoryID=" + categoryID + ", name=" + name
+				+ ", isDeleted=" + isDeleted + ", rowNumber=" + rowNumber + ", columnNumber=" + columnNumber
+				+ ", status=" + status + "]";
 	}
 	
 }

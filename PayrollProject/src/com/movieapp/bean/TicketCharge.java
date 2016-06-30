@@ -37,4 +37,11 @@ public class TicketCharge {
 	public int getQuantity() {
 		return quantity;
 	}
+
+	@Override
+	public String toString() {
+		return "TicketCharge [id=" + id + ", ticketID=" + ticketID + ", extraID=" + extraID + ", quantity=" + quantity
+				+ "]";
+	}
+	
 }

@@ -24,7 +24,9 @@ import com.movieapp.bean.ShowSeat;
 import com.movieapp.bean.Ticket;
 import com.movieapp.bean.TicketCharge;
 import com.movieapp.constants.DBConstants;
+import com.movieapp.dao.CategoryDAOImpl;
 import com.movieapp.dao.CustomerDAOImpl;
+import com.movieapp.dao.ExtraDAOImpl;
 import com.movieapp.dao.MovieDAOImpl;
 import com.movieapp.dao.MovieShowDAOImpl;
 import com.movieapp.dao.ScreenDAOImpl;
@@ -40,6 +42,8 @@ import com.movieapp.vo.MovieShowWrapperVO;
 import com.movieapp.vo.ScreenSeatsVO;
 import com.movieapp.vo.ShowSeatWrapperVO;
 import com.movieapp.vo.TicketWrapperVO;
+import com.movieapp.wrapperbean.MovieShowWapperBean;
+import com.movieapp.wrapperbean.ScreenWrapper;
 
 public class MovieBOImpl implements MovieBO
 {
@@ -110,21 +114,6 @@ public class MovieBOImpl implements MovieBO
 		MovieDAOFactory.getSeatDAO().insert(seat);
 	}
 
-	private Movie getMovie()
-	{
-		Movie movie=new Movie();
-		movie.setMovieName("Mangatha");
-		movie.setCategory("Category");
-		movie.setCertificate("U");
-		movie.setDescription("Nalla movie");
-		movie.setGenre("Etho onnu");
-		movie.setImageURL("www.google.com/Mangatha");
-		movie.setReleasedDate("14-06-2016");
-		movie.setLanguage("Tamil");
-		movie.setDuration("120 mins");
-		return movie;
-	}
-
 	private ShowDetail getShowDetail()
 	{
 		ShowDetail showDetail=new ShowDetail();
@@ -134,43 +123,12 @@ public class MovieBOImpl implements MovieBO
 		return showDetail;
 	}
 
-	private Screen getScreen()
-	{
-		Screen screen=new Screen();
-		screen.setScreenName("Screen 2");
-		screen.setScreenRows(5);
-		screen.setScreenColumns(5);
-		return screen;
-	}
-
-	private MovieShow getMovieShow()
-	{
-		MovieShow movieShow=new MovieShow();
-		movieShow.setMovieID(11004);
-		movieShow.setScreenID(6004);
-		movieShow.setShowID(8004);
-		movieShow.setMovieDate("14-06-2016");
-		return movieShow;
-	}
-
 	private Category getCategory()
 	{
 		Category category=new Category();
 		category.setCategoryName("FirstClass");
 		category.setFare(120);
 		return category;
-	}
-
-	private Seat getSeats(long screenID,long categoryID,int row,int column,String screenName)
-	{
-		Seat  seat=new Seat();
-		seat.setCategoryID(categoryID);
-		seat.setScreenID(screenID);
-		seat.setRowNumber(row);
-		seat.setColumnNumber(column);
-		seat.setName(screenName);
-		seat.setStatus(true);
-		return seat;
 	}
 
 	public ShowSeat getShowSeat(long seatID,long movieShowID)
@@ -324,7 +282,7 @@ public class MovieBOImpl implements MovieBO
 		ShowDetail showData;
 		try 
 		{
-			showData = MovieDAOFactory.getShowDAO().insert(getShowDetail());
+			showData = MovieDAOFactory.getShowDAO().insert(showDetail);
 			return showData;
 		} 
 		catch (DataAccessException e) 
@@ -345,51 +303,18 @@ public class MovieBOImpl implements MovieBO
 		ShowsDAOImpl ShowsDAOImpl=MovieDAOFactory.getShowDAO();
 		if(ShowsDAOImpl.isShowDeleteable(showID))
 		{
-			//ShowsDAOImpl.delete(showID);
+			ShowsDAOImpl.delete(showID);
 			responseMessage="Deleted successfully";
+			return responseMessage;
 		}
-		else
-		{
-			throw new UserException(responseMessage,1002);
-		}
-		return responseMessage; 
+
+		throw new UserException(responseMessage,1002);
 	}
 
 	@Override
 	public ShowDetail getShow(String id) 
 	{
 		return MovieDAOFactory.getShowDAO().retrieveWithID(id);
-	}
-
-	@Override
-	public Screen addScreen(String screenData) 
-	{
-		ScreenDAOImpl screenDAOImpl=new ScreenDAOImpl();
-		Screen screen=getScreenObject(screenData);
-		String screenName=screen.getScreenName();
-		if(!screenDAOImpl.isToAddScreen(screenName))
-		{
-			throw new UserException("Screen name already present", 1001);
-		}
-		try 
-		{
-			DataAccess.getTransactionManager().begin();
-			screen=MovieDAOFactory.getScreenDAO().insert(screen);
-			ArrayList<Seat> seats=getSeats(screenData, screen.getID());
-			insertSeats(seats);
-			DataAccess.getTransactionManager().commit();
-		} 
-		catch (DataAccessException e) 
-		{
-			rollBack();
-			throw new UserException("Error while adding screen");
-		} catch (Exception e) 
-		{
-			rollBack();
-			throw new UserException("Error while adding screen");
-		}
-		
-		return screen;
 	}
 
 	@Override
@@ -401,25 +326,16 @@ public class MovieBOImpl implements MovieBO
 		{
 			screenDAOImpl.delete(screenID);
 			responseMessage="Deleted successfully";
+			return responseMessage;
 		}
-		else
-		{
-			throw new UserException(responseMessage, 1001);
-		}
-		return responseMessage; 
+
+		throw new UserException(responseMessage, 1001);
 	}
 
 	@Override
 	public Screen getScreen(String id) 
 	{
 		return MovieDAOFactory.getScreenDAO().retrieveWithID(id);
-	}
-
-	@Override
-	public MovieShow addMovieshow(String data) 
-	{
-		addMovieShows(data);
-		return null;
 	}
 
 	@Override
@@ -431,12 +347,10 @@ public class MovieBOImpl implements MovieBO
 		{
 			movieShowDAOImpl.delete(id);
 			responseMessage="Deleted successfully";
+			return responseMessage;
 		}
-		else
-		{
-			throw new UserException(responseMessage, 1001);
-		}
-		return responseMessage;
+
+		throw new UserException(responseMessage, 1001);
 	}
 
 	@Override
@@ -527,22 +441,19 @@ public class MovieBOImpl implements MovieBO
 			rollBack();
 			throw new UserException("Ticket not booked");
 		}
-		
+
 		return getBookedTicketProperties(String.valueOf(ticketID));
 	}
-	
+
 	private void rollBack()
 	{
 		try {
 			DataAccess.getTransactionManager().rollback();
 		} catch (IllegalStateException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (SecurityException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (SystemException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -666,30 +577,31 @@ public class MovieBOImpl implements MovieBO
 		return seats;
 	}
 
-	private void insertSeats(ArrayList<Seat> seats) throws DataAccessException, Exception
+	private void insertSeats(ArrayList<Seat> seats,long screenID) throws DataAccessException, Exception
 	{
 		int size=seats.size();
 		SeatDAOImpl seatDAOImpl=new SeatDAOImpl();
 		for(int i=0;i<size;i++)
 		{
 			Seat seat=seats.get(i);
+			seat.setScreenID(screenID);
+			String seatName=String.valueOf(seat.getRowNumber())+String.valueOf(seat.getColumnNumber());
+			seat.setName(seatName);
 			seatDAOImpl.insert(seat);
 		}
 	}
 
-	private void addMovieShows(String data)
+	private void addMovieShows(List<MovieShow> movieShows)
 	{
 		MovieShowDAOImpl movieShowDAOImpl=new MovieShowDAOImpl();
 
-		try
+		try 
 		{
-			JSONObject movieShowsObject=new JSONObject(data);
-			JSONArray array=movieShowsObject.optJSONArray("movieshows");
-			int length=array.length();
+			DataAccess.getTransactionManager().begin();
+			int length=movieShows.size();
 			for(int i=0;i<length;i++)
 			{
-				JSONObject jsonObject=array.optJSONObject(i);
-				MovieShow movieShow=(MovieShow) movieAppUtil.getObject(jsonObject.toString(),MovieShow.class);
+				MovieShow movieShow=movieShows.get(i);
 				if(!movieShowDAOImpl.isToAddMovieShow(movieShow))
 				{
 					continue;
@@ -699,12 +611,19 @@ public class MovieBOImpl implements MovieBO
 				long movieShowID=movieShow.getID();
 				addShowSeats(screenID, movieShowID);
 			}
+
+		} catch (DataAccessException e) 
+		{
+			rollBack();
+			e.printStackTrace();
+		} catch (Exception e) 
+		{
+			rollBack();
+			e.printStackTrace();
 		}
 
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}	
+
+
 	}
 
 	public MovieShow updateMovieShow(MovieShow movieShow,String movieShowID) 
@@ -737,13 +656,10 @@ public class MovieBOImpl implements MovieBO
 		{
 			movieDAOImpl.delete(id);
 			responseMessage="Deleted successfully";
-		}
-		else
-		{
-			throw new UserException(responseMessage,1002);
+			return responseMessage;
 		}
 
-		return responseMessage;
+		throw new UserException(responseMessage,1002);
 	}
 
 	public Movie updateMovie(Movie movie,String movieID)
@@ -756,6 +672,90 @@ public class MovieBOImpl implements MovieBO
 	public Category getCategory(String id) 
 	{
 		return MovieDAOFactory.getCategoryDAO().retrieveWithID(String.valueOf(id));
+	}
+
+	@Override
+	public String deleteCategory(String id) 
+	{
+		String responseMessage="Category is assigned to seats,not able to delete";
+		CategoryDAOImpl categoryDAOImpl=MovieDAOFactory.getCategoryDAO();
+		if(categoryDAOImpl.isCategoryDeletable(id))
+		{
+			categoryDAOImpl.delete(id);
+			responseMessage="Deleted successfully";
+			return responseMessage;
+		}
+
+		throw new UserException(responseMessage, 1001);
+	}
+
+	@Override
+	public String deleteExtra(String id) 
+	{
+		String responseMessage="Extras is assigned to ticket,not able to delete";
+		ExtraDAOImpl extraDAOImpl=MovieDAOFactory.getExtasDAO();
+		if(extraDAOImpl.isExtrasDeleteable(id))
+		{
+			extraDAOImpl.delete(id);
+			responseMessage="Deleted successfully";
+			return responseMessage;
+		}
+
+		throw new UserException(responseMessage, 1001);
+	}
+
+	@Override
+	public String deleteCustomer(String id) 
+	{
+		String responseMessage="Customer is assigned to ticket,not able to delete";
+		CustomerDAOImpl customerDAOImpl=MovieDAOFactory.getCustomerDAO();
+		if(customerDAOImpl.isCustomerDeleteable(id))
+		{
+			customerDAOImpl.delete(id);
+			responseMessage="Deleted successfully";
+			return responseMessage;
+		}
+		throw new UserException(responseMessage, 1001);
+	}
+
+	@Override
+	public MovieShow addMovieshow(MovieShowWapperBean movieShowWapperBean) 
+	{
+		addMovieShows(movieShowWapperBean.getMovieshows());
+		return null;
+	}
+
+	@Override
+	public Screen addScreen(ScreenWrapper screenWrapper) 
+	{
+		ScreenDAOImpl screenDAOImpl=new ScreenDAOImpl();
+		Screen screen=screenWrapper.getScreen().getScreen();
+		String screenName=screen.getScreenName();
+		if(!screenDAOImpl.isToAddScreen(screenName))
+		{
+			throw new UserException("Screen name already present", 1001);
+		}
+		try 
+		{
+			DataAccess.getTransactionManager().begin();
+			screen=MovieDAOFactory.getScreenDAO().insert(screen);
+			long screenID=screen.getID();
+			ArrayList<Seat> seats=(ArrayList<Seat>) screenWrapper.getScreen().getSeats();
+			insertSeats(seats,screenID);
+			DataAccess.getTransactionManager().commit();
+		} 
+		catch (DataAccessException e) 
+		{
+			rollBack();
+			throw new UserException("Error while adding screen");
+		} 
+		catch (Exception e) 
+		{
+			rollBack();
+			throw new UserException("Error while adding screen");
+		}
+
+		return screen;
 	}
 
 }

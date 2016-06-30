@@ -6,6 +6,11 @@ public class Category
 	private String categoryName;
 	private float fare;
 	
+	@Override
+	public String toString() {
+		return "Category [id=" + id + ", categoryName=" + categoryName + ", fare=" + fare + "]";
+	}
+
 	public void setId(long id) {
 		this.id = id;
 	}
@@ -29,4 +34,5 @@ public class Category
 	public float getFare() {
 		return fare;
 	}
+	
 }

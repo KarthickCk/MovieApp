@@ -93,5 +93,12 @@ public class Movie
 	public String getDescription() {
 		return description;
 	}
+
+	@Override
+	public String toString() {
+		return "Movie [id=" + id + ", movieName=" + movieName + ", genre=" + genre + ", category=" + category
+				+ ", language=" + language + ", duration=" + duration + ", description=" + description + ", imageURL="
+				+ imageURL + ", releasedDate=" + releasedDate + ", certificate=" + certificate + "]";
+	}
 	
 }

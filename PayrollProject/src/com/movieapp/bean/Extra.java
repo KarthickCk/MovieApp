@@ -28,4 +28,9 @@ public class Extra {
 	public float getCost() {
 		return cost;
 	}
+
+	@Override
+	public String toString() {
+		return "Extra [id=" + id + ", cost=" + cost + ", name=" + name + "]";
+	}
 }

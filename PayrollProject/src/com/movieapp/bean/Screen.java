@@ -6,7 +6,20 @@ public class Screen
 	private String screenName;
 	private int screenRows;
 	private int screenColumns;
-
+	
+	public Screen()
+	{
+		
+	}
+	
+	public Screen(long id,int screenRows,int screenColumns,String screenName)
+	{
+		this.id=id;
+		this.screenRows=screenRows;
+		this.screenColumns=screenColumns;
+		this.screenName=screenName;
+	}
+	
 	public void setID(long id) {
 		this.id = id;
 	}
@@ -27,6 +40,12 @@ public class Screen
 		this.screenRows = screenRows;
 	}
 	
+	@Override
+	public String toString() {
+		return "Screen [id=" + id + ", screenName=" + screenName + ", screenRows=" + screenRows + ", screenColumns="
+				+ screenColumns + "]";
+	}
+
 	public int getScreenRows() {
 		return screenRows;
 	}

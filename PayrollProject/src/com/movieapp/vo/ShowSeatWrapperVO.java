@@ -22,7 +22,7 @@ public class ShowSeatWrapperVO
 	
 	@Override
 	public String toString() {
-		return "ShowSeatWrapperVO [showSeats=" + showSeats + ", seats=" + seats + "]";
+		return "ShowSeatWrapperVO [showSeats=" + showSeats + ", seats=" + seats + ", categories=" + categories + "]";
 	}
 
 	public ArrayList<ShowSeat> getShowSeats() {
@@ -40,4 +40,5 @@ public class ShowSeatWrapperVO
 	public void setSeats(ArrayList<Seat> seats) {
 		this.seats = seats;
 	}
+	
 }

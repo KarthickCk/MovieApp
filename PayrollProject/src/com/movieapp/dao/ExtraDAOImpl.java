@@ -1,8 +1,14 @@
 package com.movieapp.dao;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
+import com.adventnet.ds.query.Column;
+import com.adventnet.ds.query.Criteria;
 import com.adventnet.ds.query.DataSet;
+import com.adventnet.ds.query.QueryConstants;
+import com.adventnet.ds.query.SelectQueryImpl;
+import com.adventnet.ds.query.Table;
 import com.adventnet.persistence.Row;
 import com.movieapp.bean.Extra;
 import com.movieapp.constants.DBConstants;
@@ -62,6 +68,23 @@ public class ExtraDAOImpl extends ApplicationDAO<Extra>
 			e.printStackTrace();
 		}
 		return extra;
+	}
+	
+	public boolean isExtrasDeleteable(String extraID) 
+	{
+		String tableName=TicketChargeImpl.TABLE_NAME;
+		SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(tableName));
+		Criteria criteria=new Criteria(Column.getColumn(tableName, DBConstants.TC_EXTRA_ID),extraID, QueryConstants.EQUAL);
+		selectQueryImpl.setCriteria(criteria);
+		ArrayList<Column> columns=new ArrayList<>();
+		columns.add(Column.getColumn(tableName,DBConstants.TICKET_CHARGE_ID));
+		selectQueryImpl.addSelectColumns(columns);
+		Row row=getRow(selectQueryImpl,tableName);
+		if(row!=null)
+		{
+			return false;
+		}
+		return true;	
 	}
 
 }

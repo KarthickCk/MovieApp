@@ -46,4 +46,10 @@ public class ShowSeat {
 	public long getMovieShowID() {
 		return movieShowID;
 	}
+
+	@Override
+	public String toString() {
+		return "ShowSeat [id=" + id + ", ticketID=" + ticketID + ", seatID=" + seatID + ", movieShowID=" + movieShowID
+				+ ", isAvailable=" + isAvailable + "]";
+	}
 }

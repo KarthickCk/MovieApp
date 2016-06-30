@@ -57,4 +57,10 @@ public class MovieShow
 	public String getMovieDate() {
 		return movieDate;
 	}
+
+	@Override
+	public String toString() {
+		return "MovieShow [id=" + id + ", screenID=" + screenID + ", showID=" + showID + ", movieID=" + movieID
+				+ ", movieDate=" + movieDate + ", availableSeats=" + availableSeats + "]";
+	}
 }

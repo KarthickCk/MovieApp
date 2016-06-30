@@ -38,4 +38,11 @@ public class ShowDetail
 	public String getEndTime() {
 		return endTime;
 	}
+
+	@Override
+	public String toString() {
+		return "ShowDetail [id=" + id + ", showName=" + showName + ", startTime=" + startTime + ", endTime=" + endTime
+				+ "]";
+	}
+	
 }

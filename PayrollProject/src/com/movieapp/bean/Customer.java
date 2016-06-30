@@ -37,4 +37,9 @@ public class Customer {
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
+
+	@Override
+	public String toString() {
+		return "Customer [id=" + id + ", name=" + name + ", email=" + email + ", phoneNumber=" + phoneNumber + "]";
+	}
 }
