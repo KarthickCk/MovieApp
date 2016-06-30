@@ -135,7 +135,7 @@ public class MovieAppRestApi
 		Screen screen=movieBO.addScreen(screenWrapper);
 		HashMap<String, Screen> screenData=new HashMap<>();
 		screenData.put("screen", screen);
-		return Response.ok(screenWrapper).build();
+		return Response.ok(screen).build();
 	}
 
 	@GET
