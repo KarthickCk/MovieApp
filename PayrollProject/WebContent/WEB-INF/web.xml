@@ -54,7 +54,7 @@
 
 	<servlet-mapping>
 		<servlet-name>RestContainer</servlet-name>
-		<url-pattern>/PayrollProject/*</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
 
