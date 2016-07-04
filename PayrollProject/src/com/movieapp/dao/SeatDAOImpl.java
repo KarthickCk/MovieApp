@@ -83,7 +83,7 @@ public class SeatDAOImpl extends ApplicationDAO<Seat>
 		return null;
 	}
 	
-	public boolean isSeatDeleteable(String seatID)
+	public boolean isSeatUpdateable(String seatID)
 	{
 		String tableName=ShowSeatDAOImpl.TABLE_NAME;
 		SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(tableName));
@@ -103,9 +103,4 @@ public class SeatDAOImpl extends ApplicationDAO<Seat>
 		return true;
 	}
 	
-	public boolean isSeatUpdate(String screenID)
-	{
-		return false;
-	}
-
 }

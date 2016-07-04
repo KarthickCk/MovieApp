@@ -76,7 +76,7 @@ public class ScreenDAOImpl extends ApplicationDAO<Screen>
 		return null;
 	}
 	
-	public boolean isScreenShowDeleteable(String screenID) 
+	public boolean isScreenUpdateable(String screenID) 
 	{
 		SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(getTableName()));
 		Criteria criteria=new Criteria(Column.getColumn(ShowSeatDAOImpl.TABLE_NAME, DBConstants.SS_TICKET_ID), "0", QueryConstants.NOT_EQUAL);

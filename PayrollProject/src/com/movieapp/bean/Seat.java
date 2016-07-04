@@ -11,7 +11,7 @@ public class Seat
 	private long columnNumber;
 	private boolean status;
 	
-	public boolean isDeleted() {
+	public boolean getIsDeleted() {
 		return isDeleted;
 	}
 

@@ -1,9 +1,12 @@
 package com.movieapp.dao;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import com.adventnet.ds.query.Column;
+import com.adventnet.ds.query.Criteria;
 import com.adventnet.ds.query.DataSet;
+import com.adventnet.ds.query.QueryConstants;
 import com.adventnet.ds.query.SelectQueryImpl;
 import com.adventnet.ds.query.Table;
 import com.adventnet.mfw.bean.BeanUtil;
@@ -101,11 +104,28 @@ public class ShowSeatDAOImpl extends ApplicationDAO<ShowSeat>
 			dataObject=persistence.update(dataObject);
 			return dataObject.size(getTableName());
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
 		
+	}
+	
+	public boolean isShowSeatUpdateable(String showSeatId)
+	{
+		String tableName=ShowSeatDAOImpl.TABLE_NAME;
+		SelectQueryImpl selectQueryImpl=new SelectQueryImpl(Table.getTable(tableName));
+		ArrayList<Column> columns=new ArrayList<>();
+		Criteria criteria=new Criteria(Column.getColumn(tableName, DBConstants.SS_TICKET_ID), "0", QueryConstants.NOT_EQUAL);
+		columns.add(Column.getColumn(tableName, DBConstants.SHOW_SEAT_ID));
+		selectQueryImpl.addSelectColumns(columns);
+		selectQueryImpl.setCriteria(criteria);
+		Row row=getRow(selectQueryImpl,tableName);
+		if(row!=null)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 
 }

@@ -24,15 +24,11 @@ import com.movieapp.bean.ShowSeat;
 import com.movieapp.bean.Ticket;
 import com.movieapp.bean.TicketCharge;
 import com.movieapp.constants.DBConstants;
-import com.movieapp.dao.CategoryDAOImpl;
 import com.movieapp.dao.CustomerDAOImpl;
-import com.movieapp.dao.ExtraDAOImpl;
-import com.movieapp.dao.MovieDAOImpl;
 import com.movieapp.dao.MovieShowDAOImpl;
 import com.movieapp.dao.ScreenDAOImpl;
 import com.movieapp.dao.SeatDAOImpl;
 import com.movieapp.dao.ShowSeatDAOImpl;
-import com.movieapp.dao.ShowsDAOImpl;
 import com.movieapp.dao.TicketDAOImpl;
 import com.movieapp.exception.UserException;
 import com.movieapp.factory.MovieDAOFactory;
@@ -48,7 +44,8 @@ import com.movieapp.wrapperbean.ScreenWrapper;
 public class MovieBOImpl implements MovieBO
 {
 	MovieAppUtil movieAppUtil=MovieAppUtil.INSTANCES;
-
+	
+	@Override
 	public MovieShowWrapperVO getMovieShowDetails(ArrayList<String> columns,ArrayList<String> values)
 	{
 		UserBOImpl userBO=new UserBOImpl();
@@ -107,28 +104,6 @@ public class MovieBOImpl implements MovieBO
 		UserBOImpl userBO=new UserBOImpl();
 		Criteria criteria=movieAppUtil.getCriteria(ShowSeatDAOImpl.TABLE_NAME, getShowSeatsColumnsToFilter(columns), values);
 		return userBO.getShowSeatProperties(criteria);
-	}
-
-	public void addSeat(Seat seat) throws DataAccessException, Exception
-	{
-		MovieDAOFactory.getSeatDAO().insert(seat);
-	}
-
-	private ShowDetail getShowDetail()
-	{
-		ShowDetail showDetail=new ShowDetail();
-		showDetail.setShowName("Night");
-		showDetail.setStartTime("9.30 PM");
-		showDetail.setEndTime("12.00 AM");
-		return showDetail;
-	}
-
-	private Category getCategory()
-	{
-		Category category=new Category();
-		category.setCategoryName("FirstClass");
-		category.setFare(120);
-		return category;
 	}
 
 	public ShowSeat getShowSeat(long seatID,long movieShowID)
@@ -296,20 +271,7 @@ public class MovieBOImpl implements MovieBO
 		return showDetail;
 	}
 
-	@Override
-	public String deleteShow(String showID) 
-	{
-		String responseMessage="Ticket for the screen is booked";
-		ShowsDAOImpl ShowsDAOImpl=MovieDAOFactory.getShowDAO();
-		if(ShowsDAOImpl.isShowDeleteable(showID))
-		{
-			ShowsDAOImpl.delete(showID);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage,1002);
-	}
+	
 
 	@Override
 	public ShowDetail getShow(String id) 
@@ -317,20 +279,7 @@ public class MovieBOImpl implements MovieBO
 		return MovieDAOFactory.getShowDAO().retrieveWithID(id);
 	}
 
-	@Override
-	public String deleteScreen(String screenID) 
-	{
-		String responseMessage="Ticket for the screen is booked";
-		ScreenDAOImpl screenDAOImpl=MovieDAOFactory.getScreenDAO();
-		if(screenDAOImpl.isScreenShowDeleteable(screenID))
-		{
-			screenDAOImpl.delete(screenID);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage, 1001);
-	}
+	
 
 	@Override
 	public Screen getScreen(String id) 
@@ -339,27 +288,12 @@ public class MovieBOImpl implements MovieBO
 	}
 
 	@Override
-	public String deleteMovieShow(String id) 
-	{
-		String responseMessage="Ticket for the show is booked";
-		MovieShowDAOImpl movieShowDAOImpl=MovieDAOFactory.getMovieShowDAO();
-		if(movieShowDAOImpl.isMovieShowDeleteable(id))
-		{
-			movieShowDAOImpl.delete(id);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage, 1001);
-	}
-
-	@Override
 	public Category addCategory(Category category) 
 	{
 		Category categoryData;
 		try 
 		{
-			categoryData = MovieDAOFactory.getCategoryDAO().insert(getCategory());
+			categoryData = MovieDAOFactory.getCategoryDAO().insert(category);
 			return categoryData;
 		} 
 		catch (DataAccessException e) 
@@ -647,21 +581,7 @@ public class MovieBOImpl implements MovieBO
 		return customer;
 	}
 
-	@Override
-	public String deleteMovie(String id) 
-	{
-		String responseMessage="Movie tickets gets booked";
-		MovieDAOImpl movieDAOImpl=new MovieDAOImpl();
-		if(movieDAOImpl.isMovieDeleteable(id))
-		{
-			movieDAOImpl.delete(id);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage,1002);
-	}
-
+	
 	public Movie updateMovie(Movie movie,String movieID)
 	{
 		AdminBOImpl  adminBOImpl=new AdminBOImpl();
@@ -672,50 +592,6 @@ public class MovieBOImpl implements MovieBO
 	public Category getCategory(String id) 
 	{
 		return MovieDAOFactory.getCategoryDAO().retrieveWithID(String.valueOf(id));
-	}
-
-	@Override
-	public String deleteCategory(String id) 
-	{
-		String responseMessage="Category is assigned to seats,not able to delete";
-		CategoryDAOImpl categoryDAOImpl=MovieDAOFactory.getCategoryDAO();
-		if(categoryDAOImpl.isCategoryDeletable(id))
-		{
-			categoryDAOImpl.delete(id);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage, 1001);
-	}
-
-	@Override
-	public String deleteExtra(String id) 
-	{
-		String responseMessage="Extras is assigned to ticket,not able to delete";
-		ExtraDAOImpl extraDAOImpl=MovieDAOFactory.getExtasDAO();
-		if(extraDAOImpl.isExtrasDeleteable(id))
-		{
-			extraDAOImpl.delete(id);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-
-		throw new UserException(responseMessage, 1001);
-	}
-
-	@Override
-	public String deleteCustomer(String id) 
-	{
-		String responseMessage="Customer is assigned to ticket,not able to delete";
-		CustomerDAOImpl customerDAOImpl=MovieDAOFactory.getCustomerDAO();
-		if(customerDAOImpl.isCustomerDeleteable(id))
-		{
-			customerDAOImpl.delete(id);
-			responseMessage="Deleted successfully";
-			return responseMessage;
-		}
-		throw new UserException(responseMessage, 1001);
 	}
 
 	@Override
@@ -756,6 +632,24 @@ public class MovieBOImpl implements MovieBO
 		}
 
 		return screen;
+	}
+
+	@Override
+	public Extra getExtra(String id) 
+	{
+		return MovieDAOFactory.getExtasDAO().retrieveWithID(String.valueOf(id));
+	}
+
+	@Override
+	public Seat getSeat(String id) 
+	{
+		return MovieDAOFactory.getSeatDAO().retrieveWithID(String.valueOf(id));
+	}
+
+	@Override
+	public ShowSeat getShowSeat(String id) 
+	{
+		return MovieDAOFactory.getShowSeatDAO().retrieveWithID(String.valueOf(id));
 	}
 
 }

@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.movieapp.bdao.AdminBOImpl;
 import com.movieapp.bdao.MovieBOImpl;
 import com.movieapp.bean.Category;
 import com.movieapp.bean.Customer;
@@ -40,16 +41,22 @@ import com.movieapp.vo.MovieShowWrapperVO;
 import com.movieapp.vo.ScreenSeatsVO;
 import com.movieapp.vo.ShowSeatWrapperVO;
 import com.movieapp.vo.TicketWrapperVO;
+import com.movieapp.wrapperbean.CategoryWrapperBean;
+import com.movieapp.wrapperbean.CustomerWrapperBean;
+import com.movieapp.wrapperbean.ExtraWrapperBean;
 import com.movieapp.wrapperbean.MovieShowWapperBean;
 import com.movieapp.wrapperbean.MovieWrapperBean;
-import com.movieapp.wrapperbean.ScreenSeatsWrapperBean;
 import com.movieapp.wrapperbean.ScreenWrapper;
+import com.movieapp.wrapperbean.SeatWrapperBean;
+import com.movieapp.wrapperbean.ShowSeatWrapperBean;
 import com.movieapp.wrapperbean.ShowWrapperBean;
+import com.movieapp.wrapperbean.TicketWrapperBean;
 
 @Path("/movieapp")
 public class MovieAppRestApi 
 {
 	MovieBOImpl movieBO=new MovieBOImpl();
+	AdminBOImpl adminBO=new AdminBOImpl();
 
 	@GET 		 
 	@Path("/movies")
@@ -67,7 +74,7 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovie(@PathParam("id") String id)
 	{
-		String message=movieBO.deleteMovie(id);
+		String message=adminBO.deleteMovie(id);
 		return Response.ok(null).build();
 	}
 	
@@ -178,7 +185,7 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteScreen(@PathParam("id") String id)
 	{
-		String message=movieBO.deleteScreen(id);
+		String message=adminBO.deleteScreen(id);
 		return Response.ok(null).build();
 	}
 
@@ -252,7 +259,7 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovieShow(@PathParam("id") String id)
 	{
-		String message=movieBO.deleteMovieShow(id);
+		String message=adminBO.deleteMovieShow(id);
 		return Response.ok(null).build();
 	}
 
@@ -298,7 +305,7 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteShow(@PathParam("id") String id) 
 	{
-		String response=movieBO.deleteShow(id);
+		String response=adminBO.deleteShow(id);
 		return Response.ok(null).build();
 	}
 
@@ -328,9 +335,9 @@ public class MovieAppRestApi
 	@Path("/categories")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addCategory(@QueryParam("data") String data) 
+	public Response addCategory(CategoryWrapperBean categoryWrapperBean) 
 	{
-		Category category=movieBO.addCategory(null);
+		Category category=movieBO.addCategory(categoryWrapperBean.getCategory());
 		HashMap<String, Category> categoryData=new HashMap<>();
 		categoryData.put("category", category);
 		return Response.ok(categoryData).build();
@@ -341,8 +348,21 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteCategory(@PathParam("id") String id) 
 	{
-		String response=movieBO.deleteCategory(id);
-		return Response.ok(null).build();
+		String response=adminBO.deleteCategory(id);
+		return Response.ok(response).build();
+	}
+	
+	@PUT
+	@Path("/categories/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateExtras(@PathParam("id")String id,CategoryWrapperBean categoryWrapperBean) 
+	{
+		Category category=categoryWrapperBean.getCategory();
+		category=adminBO.updateCategory(id, category);
+		HashMap<String, Category> categoryData=new HashMap<>();
+		categoryData.put("category", category);
+		return Response.ok(categoryData).build();
 	}
 
 	@GET
@@ -379,11 +399,11 @@ public class MovieAppRestApi
 	@Path("/extras")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addExtras(@QueryParam("data") String data) 
+	public Response addExtras(String data) 
 	{
 		Extra extra=movieBO.addExtra(null);
 		HashMap<String, Extra> extraData=new HashMap<>();
-		extraData.put("extra", extra);
+		extraData.put("extras", extra);
 		return Response.ok(extraData).build();
 	}
 	
@@ -392,32 +412,45 @@ public class MovieAppRestApi
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteExtras(@PathParam("id") String id) 
 	{
-		String response=movieBO.deleteExtra(id);
-		return Response.ok(null).build();
+		String response=adminBO.deleteExtra(id);
+		return Response.ok(response).build();
+	}
+	
+	@GET
+	@Path("/extras/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getExtra(@PathParam("id") String id) 
+	{
+		Extra extra=movieBO.getExtra(id);
+		HashMap<String, Extra> extraData=new HashMap<>();
+		extraData.put("extras", extra);
+		return Response.ok(extraData).build();
+	}
+	
+	@PUT
+	@Path("/extras/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateExtras(@PathParam("id")String id,ExtraWrapperBean extraWrapperBean) 
+	{
+		Extra extra=extraWrapperBean.getExtras();
+		extra=adminBO.updateExtras(id, extra);
+		HashMap<String, Extra> extraData=new HashMap<>();
+		extraData.put("extras", extra);
+		return Response.ok(extraData).build();
 	}
 	
 	@POST
 	@Path("/customers")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response addCustomer(String data) 
+	public Response addCustomer(CustomerWrapperBean customerWrapperBean) 
 	{
 		HashMap<String, Customer> customerData=new  HashMap<>();
-		customerData.put("customer", null);
-		try
-		{
-			JSONObject jsonObject=new JSONObject(data);
-			JSONObject customerObject=jsonObject.optJSONObject("customer");
-			Customer customer=(Customer)getObject(customerObject.toString(), Customer.class);
-			customer=movieBO.addCustomer(customer);
-			customerData.put("customer", customer);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
+		Customer customer=customerWrapperBean.getCustomers();
+		customer=movieBO.addCustomer(customer);
+		customerData.put("customers", customer);
 		return Response.ok(customerData).build();
-		
 	}
 	
 	@GET
@@ -440,8 +473,122 @@ public class MovieAppRestApi
 		}
 		customers.add(customer);
 		HashMap<String, ArrayList<Customer>> customerData=new  HashMap<>();
-		customerData.put("customer", customers);
+		customerData.put("customers", customers);
 		return Response.ok(customerData).build();		
+	}
+	
+	@DELETE
+	@Path("/customers/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteCustomer(@PathParam("id") String id) 
+	{
+		String response=adminBO.deleteCustomer(id);
+		return Response.ok(response).build();
+	}
+	
+	@PUT
+	@Path("/customers/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateExtras(@PathParam("id")String id,CustomerWrapperBean customerWrapperBean) 
+	{
+		Customer customer=customerWrapperBean.getCustomers();
+		customer=adminBO.updateCustomer(id, customer);
+		HashMap<String, Customer> customerData=new HashMap<>();
+		customerData.put("customers", customer);
+		return Response.ok(customerData).build();
+	}
+	
+	@GET
+	@Path("/showseats/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getShowSeat(@PathParam("id") String id) 
+	{
+		ShowSeat showSeat=movieBO.getShowSeat(id);
+		HashMap<String, ShowSeat> showSeatData=new HashMap<>();
+		showSeatData.put("showseats", showSeat);
+		return Response.ok(showSeatData).build();
+	}
+
+	@POST
+	@Path("/showseats")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addShowSeat(ShowSeatWrapperBean showSeatWrapperBean) 
+	{
+		ShowSeat showSeat=showSeatWrapperBean.getShowseats();
+		showSeat=adminBO.addShowSeat(showSeat);
+		HashMap<String, ShowSeat> showSeatData=new HashMap<>();
+		showSeatData.put("showseats", showSeat);
+		return Response.ok(showSeatData).build();
+	}
+	
+	@DELETE
+	@Path("/showseats/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteShowSeat(@PathParam("id") String id) 
+	{
+		String response=adminBO.deleteShowSeat(id);
+		return Response.ok(response).build();
+	}
+	
+	@PUT
+	@Path("/showseats/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateShowSeat(@PathParam("id")String id,ShowSeatWrapperBean showSeatWrapperBean) 
+	{
+		ShowSeat showSeat=showSeatWrapperBean.getShowseats();
+		showSeat=adminBO.updateShowSeat(id, showSeat);
+		HashMap<String, ShowSeat> showSeatData=new HashMap<>();
+		showSeatData.put("showseats", showSeat);
+		return Response.ok(showSeatData).build();
+	}
+	
+	@GET
+	@Path("/seats/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getSeat(@PathParam("id") String id) 
+	{
+		Seat seat=movieBO.getSeat(id);
+		HashMap<String, Seat> seatData=new HashMap<>();
+		seatData.put("seats", seat);
+		return Response.ok(seatData).build();
+	}
+
+	@POST
+	@Path("/seats")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addSeat(SeatWrapperBean seatWrapperBean) 
+	{
+		Seat seat=seatWrapperBean.getSeats();
+		seat=adminBO.addSeat(seat);
+		HashMap<String, Seat> seatData=new HashMap<>();
+		seatData.put("seats", seat);
+		return Response.ok(seatData).build();
+	}
+	
+	@DELETE
+	@Path("/seats/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteSeat(@PathParam("id") String id) 
+	{
+		String response=adminBO.deleteSeat(id);
+		return Response.ok(response).build();
+	}
+	
+	@PUT
+	@Path("/seats/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateSeat(@PathParam("id")String id,SeatWrapperBean seatWrapperBean) 
+	{
+		Seat seat=seatWrapperBean.getSeats();
+		seat=adminBO.updateSeat(id, seat);
+		HashMap<String, Seat> seatData=new HashMap<>();
+		seatData.put("seats", seat);
+		return Response.ok(seatData).build();
 	}
 	
 	@POST
@@ -462,6 +609,28 @@ public class MovieAppRestApi
 	{
 		TicketWrapperVO ticketWrapperVO=movieBO.getBookedTicketProperties(id);
 		return Response.ok(getBookedTicketResponse(ticketWrapperVO)).build();
+	}
+	
+	@DELETE
+	@Path("/tickets/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response deleteTicket(@PathParam("id") String id) 
+	{
+		String response=adminBO.deleteTicket(id);
+		return Response.ok(response).build();
+	}
+	
+	@PUT
+	@Path("/tickets/{id}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateTicket(@PathParam("id")String id,TicketWrapperBean ticketWrapperBean) 
+	{
+		Ticket ticket=ticketWrapperBean.getTickets();
+		ticket=adminBO.updateTicket(id, ticket);
+		HashMap<String, Ticket> ticketData=new HashMap<>();
+		ticketData.put("tickets", ticket);
+		return Response.ok(ticketData).build();
 	}
 
 	private String getMovieShowResponse(MovieShowWrapperVO movieShowWrapperVO)
@@ -626,7 +795,7 @@ public class MovieAppRestApi
 		String showData=getJSON("shows", showLists);
 		String movieShowData=getJSON("movieshows", movieShows);
 		String customerData=getJSON("customers", customers);
-		String ticketChargeData=getJSON("ticketcharges", ticketCharges);
+		String ticketChargeData=getJSON("ticketextras", ticketCharges);
 		String extraData=getJSON("extras", extras);
 		String categoryData=getJSON("categories", categories);
 		String ticketData=getJSONWithoutRootName(tickets);
@@ -675,7 +844,7 @@ public class MovieAppRestApi
 			JSONArray seatId=new JSONArray(seatIds);
 			JSONArray chargeId=new JSONArray(ticketChargeIDs);
 			jsonObject.put("seats", seatId);
-			jsonObject.put("ticketcharges", chargeId);
+			jsonObject.put("ticketextras", chargeId);
 			JSONArray array=new JSONArray();
 			array.put(jsonObject);
 			JSONObject object=new JSONObject();
