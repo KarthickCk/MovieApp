@@ -2,6 +2,7 @@ package com.movieapp.bdao;
 
 import java.util.ArrayList;
 
+import com.adventnet.persistence.DataAccess;
 import com.adventnet.persistence.DataAccessException;
 import com.movieapp.bean.Category;
 import com.movieapp.bean.Customer;
@@ -70,7 +71,7 @@ public class AdminBOImpl implements AdminBO
 				} 
 				catch (DataAccessException e) 
 				{
-					e.printStackTrace();
+					throw new UserException("Seat not updated");
 				} 
 				catch (Exception e) 
 				{

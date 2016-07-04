@@ -178,7 +178,7 @@ public class MovieShowDAOImpl extends ApplicationDAO<MovieShow>
 	
 	private void addMovieShowList(SelectQueryImpl selectQueryImpl, MovieShowWrapperVO msdetails)
 	{
-		msdetails.setMovieShowList( (ArrayList<MovieShow>) executeQuery(selectQueryImpl) );
+		msdetails.setMovieshows( (ArrayList<MovieShow>) executeQuery(selectQueryImpl) );
 	}
 	
 	private void addMovieList(SelectQueryImpl selectQueryImpl, MovieShowWrapperVO msdetails)
@@ -188,7 +188,7 @@ public class MovieShowDAOImpl extends ApplicationDAO<MovieShow>
 		int size=movieList.size();
 		for(int i=0;i<size;i++)
 		{
-			msdetails.getMovieList().add(movieDAOImpl.getAsBean(movieList.get(i)));
+			msdetails.getMovies().add(movieDAOImpl.getAsBean(movieList.get(i)));
 		}
 	}
 	
@@ -199,7 +199,7 @@ public class MovieShowDAOImpl extends ApplicationDAO<MovieShow>
 		int size=showList.size();
 		for(int i=0;i<size;i++)
 		{
-			msdetails.getShowList().add(showSeatDAOImpl.getAsBean(showList.get(i)));
+			msdetails.getShows().add(showSeatDAOImpl.getAsBean(showList.get(i)));
 		}
 	}
 	
@@ -210,7 +210,7 @@ public class MovieShowDAOImpl extends ApplicationDAO<MovieShow>
 		int size=screenList.size();
 		for(int i=0;i<size;i++)
 		{
-			msdetails.getScreenList().add(screenDAOImpl.getAsBean(screenList.get(i)));
+			msdetails.getScreens().add(screenDAOImpl.getAsBean(screenList.get(i)));
 		}
 	}
 

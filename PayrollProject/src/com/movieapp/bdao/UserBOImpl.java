@@ -49,6 +49,7 @@ import com.movieapp.vo.MovieShowWrapperVO;
 import com.movieapp.vo.ScreenSeatsVO;
 import com.movieapp.vo.ShowSeatWrapperVO;
 import com.movieapp.vo.TicketWrapperVO;
+import com.movieapp.wrapperbean.TicketBookingWrapperBean;
 
 public class UserBOImpl implements UserBO
 {
@@ -102,21 +103,21 @@ public class UserBOImpl implements UserBO
 			ShowsDAOImpl showsDAOImpl=new ShowsDAOImpl();
 			while(ds.next())
 			{
-				msdetails.getMovieShowList().add(movieShowDAOImpl.getAsBean(ds));
+				msdetails.getMovieshows().add(movieShowDAOImpl.getAsBean(ds));
 				Movie movie=movieDAOImpl.getAsBean(ds);
 				Screen screen=screenDAOImpl.getAsBean(ds);
 				ShowDetail showDetail=showsDAOImpl.getAsBean(ds);
 				if(!msdetails.isMovieAdded(movie))
 				{
-					msdetails.getMovieList().add(movie);
+					msdetails.getMovies().add(movie);
 				}
 				if(!msdetails.isSCreenAdded(screen))
 				{
-					msdetails.getScreenList().add(screen);
+					msdetails.getScreens().add(screen);
 				}
 				if(!msdetails.isShowAdded(showDetail))
 				{
-					msdetails.getShowList().add(showDetail);
+					msdetails.getShows().add(showDetail);
 				}
 			}
 		} 
@@ -182,27 +183,28 @@ public class UserBOImpl implements UserBO
 		return screens;
 	}
 	
-	private ArrayList<Ticket> getTicket(DataObject dataObject)
+	private TicketBookingWrapperBean getTicket(DataObject dataObject)
 	{
-		ArrayList<Ticket> tickets=new ArrayList<>();
 		TicketDAOImpl ticketDAOImpl=new TicketDAOImpl();
+		
+		TicketBookingWrapperBean ticketBookingWrapperBean=new TicketBookingWrapperBean();
 		try 
 		{
-			Iterator<Row> iterator=dataObject.getRows(TicketDAOImpl.TABLE_NAME);
-			while(iterator.hasNext())
-			{
-				Row row=iterator.next();
-				tickets.add(ticketDAOImpl.getAsBean(row));
-			}
+			Row row=dataObject.getFirstRow(TicketDAOImpl.TABLE_NAME);
+			Ticket ticket=ticketDAOImpl.getAsBean(row);
+			ticketBookingWrapperBean.setId(ticket.getId());
+			ticketBookingWrapperBean.setMovieShowID(ticket.getMovieShowID());
+			ticketBookingWrapperBean.setCustomerID(ticket.getCustomerID());
+			ticketBookingWrapperBean.setTotalCost(ticket.getTotalCost());
 		} 
 		catch (DataAccessException e) 
 		{
 			e.printStackTrace();
 		}
-		return tickets;
+		return ticketBookingWrapperBean;
 	}
 	
-	private ArrayList<Seat> getSeats(DataObject dataObject,TicketWrapperVO ticketWrapperVO)
+	private ArrayList<Seat> getSeats(DataObject dataObject,TicketBookingWrapperBean ticketBookingWrapperBean)
 	{
 		ArrayList<Seat> seats=new ArrayList<>();
 		SeatDAOImpl seatDAOImpl=new SeatDAOImpl();
@@ -214,7 +216,7 @@ public class UserBOImpl implements UserBO
 				Row row=iterator.next();
 				Seat seat=seatDAOImpl.getAsBean(row);
 				long id=seat.getId();
-				ticketWrapperVO.getSeatIDs().add(id);
+				ticketBookingWrapperBean.getSeats().add(id);
 				seats.add(seat);
 			}
 		} 
@@ -327,7 +329,7 @@ public class UserBOImpl implements UserBO
 		return customers;
 	}
 	
-	private ArrayList<TicketCharge> getTicketCharge(DataObject dataObject,TicketWrapperVO ticketWrapperVO)
+	private ArrayList<TicketCharge> getTicketCharge(DataObject dataObject,TicketBookingWrapperBean ticketBookingWrapperBean)
 	{
 		ArrayList<TicketCharge> ticketCharge=new ArrayList<>();
 		TicketChargeImpl ticketChargeImpl=new TicketChargeImpl();
@@ -338,7 +340,7 @@ public class UserBOImpl implements UserBO
 			{
 				Row row=iterator.next();
 				TicketCharge charge=ticketChargeImpl.getAsBean(row);
-				ticketWrapperVO.getTicketChargeIDs().add(charge.getId());
+				ticketBookingWrapperBean.getTicketCharges().add(charge.getId());
 				ticketCharge.add(charge);
 			}
 		} 
@@ -407,7 +409,7 @@ public class UserBOImpl implements UserBO
 			while(ds.next())
 			{
 				ShowSeat showSeat=showSeatDAOImpl.getAsBean(ds);
-				seatWrapperVO.getShowSeats().add(showSeat);
+				seatWrapperVO.getShowseats().add(showSeat);
 				Seat seat=seatDAOImpl.getAsBean(ds);
 				seatWrapperVO.getSeats().add(seat);
 				Category category=categoryDAOImpl.getAsBean(ds);
@@ -467,7 +469,7 @@ public class UserBOImpl implements UserBO
 			DataObject dataObject = persist.get(selectQueryImpl);
 			screenSeatsVO.setScreens(getScreens(dataObject));
 			screenSeatsVO.setSeats(getSeats(dataObject));
-			screenSeatsVO.setCategorys(getCategories(dataObject));
+			screenSeatsVO.setCategories(getCategories(dataObject));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -546,16 +548,17 @@ public class UserBOImpl implements UserBO
 		{
 			Persistence persist = (Persistence) BeanUtil.lookup("Persistence");
 			DataObject dataObject = persist.get(selectQuery);
+			TicketBookingWrapperBean ticketBookingWrapperBean=getTicket(dataObject);
 			ticketWrapperVO.setScreens(getScreens(dataObject));
-			ticketWrapperVO.setSeats(getSeats(dataObject,ticketWrapperVO));
+			ticketWrapperVO.setSeats(getSeats(dataObject,ticketBookingWrapperBean));
 			ticketWrapperVO.setMovies(getMovies(dataObject));
 			ticketWrapperVO.setShowDetails(getShows(dataObject));
 			ticketWrapperVO.setMovieShows(getMovieShows(dataObject));
 			ticketWrapperVO.setCustomers(getCustomer(dataObject));
-			ticketWrapperVO.setTicketCharges(getTicketCharge(dataObject,ticketWrapperVO));
+			ticketWrapperVO.setTicketCharges(getTicketCharge(dataObject,ticketBookingWrapperBean));
 			ticketWrapperVO.setExtras(getExtra(dataObject));
 			ticketWrapperVO.setCategories(getCategories(dataObject));
-			ticketWrapperVO.setTickets(getTicket(dataObject));
+			ticketWrapperVO.setTicket(ticketBookingWrapperBean);
 		} 
 		
 		catch (Exception e) {
@@ -570,20 +573,6 @@ public class UserBOImpl implements UserBO
 	{
 		SelectQuery selectQuery=getBookedTicketSelectQuery(criteria);
 		TicketWrapperVO ticketWrapperVO=getBookedTicketObject(selectQuery);
-//		Properties properties=new Properties();
-//		properties.put("Screens",ticketWrapperVO.getScreens());
-//		properties.put("Seats",ticketWrapperVO.getSeats());
-//		properties.put("Movies",ticketWrapperVO.getMovies());
-//		properties.put("Shows",ticketWrapperVO.getShowDetails());
-//		properties.put("MovieShows",ticketWrapperVO.getMovieShows());
-//		properties.put("Customers",ticketWrapperVO.getCustomers());
-//		properties.put("TicketCharges",ticketWrapperVO.getTicketCharges());
-//		properties.put("Extras",ticketWrapperVO.getExtras());
-//		properties.put("Categories",ticketWrapperVO.getCategories());
-//		properties.put("Tickets",ticketWrapperVO.getTickets());
-//		properties.put("TicketChargeIDs",ticketWrapperVO.getTicketChargeIDs());
-//		properties.put("SeatIDs",ticketWrapperVO.getSeatIDs());
-
 		return ticketWrapperVO;
 	}
 	

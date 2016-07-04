@@ -10,8 +10,8 @@ import com.movieapp.bean.MovieShow;
 import com.movieapp.bean.Screen;
 import com.movieapp.bean.Seat;
 import com.movieapp.bean.ShowDetail;
-import com.movieapp.bean.Ticket;
 import com.movieapp.bean.TicketCharge;
+import com.movieapp.wrapperbean.TicketBookingWrapperBean;
 
 public class TicketWrapperVO 
 {
@@ -24,38 +24,28 @@ public class TicketWrapperVO
 	ArrayList<Screen> screens=new ArrayList<>();
 	ArrayList<ShowDetail> showDetails=new ArrayList<>();
 	ArrayList<Movie> movies=new ArrayList<>();
-	ArrayList<Long> ticketChargeIDs=new ArrayList<>();
-	ArrayList<Ticket> tickets=new ArrayList<>();
+	TicketBookingWrapperBean ticket=new TicketBookingWrapperBean();
 
-	public ArrayList<Ticket> getTickets() {
-		return tickets;
-	}
-
-	public void setTickets(ArrayList<Ticket> tickets) {
-		this.tickets = tickets;
+	public TicketBookingWrapperBean getTicket() {
+		return ticket;
 	}
 
-	public ArrayList<Long> getTicketChargeIDs() {
-		return ticketChargeIDs;
+
+	public void setTicket(TicketBookingWrapperBean tickets) {
+		this.ticket = tickets;
 	}
-	
-	public void setTicketChargeIDs(ArrayList<Long> ticketChargeIDs) {
-		this.ticketChargeIDs = ticketChargeIDs;
+
+
+	public void setSeats(ArrayList<Seat> seats) {
+		this.seats = seats;
 	}
-	public ArrayList<Long> getSeatIDs() {
-		return seatIDs;
-	}
-	public void setSeatIDs(ArrayList<Long> seatIDs) {
-		this.seatIDs = seatIDs;
-	}
-	ArrayList<Long> seatIDs=new ArrayList<>();
+
 
 	public ArrayList<Seat> getSeats() {
 		return seats;
 	}
-	public void setSeats(ArrayList<Seat> seats) {
-		this.seats = seats;
-	}
+	
+	
 	public ArrayList<Category> getCategories() {
 		return categories;
 	}
@@ -104,14 +94,15 @@ public class TicketWrapperVO
 	public void setMovies(ArrayList<Movie> movies) {
 		this.movies = movies;
 	}
-
+	
 	@Override
 	public String toString() {
 		return "TicketWrapperVO [seats=" + seats + ", categories=" + categories + ", ticketCharges=" + ticketCharges
 				+ ", extras=" + extras + ", customers=" + customers + ", movieShows=" + movieShows + ", screens="
-				+ screens + ", showDetails=" + showDetails + ", movies=" + movies + ", ticketChargeIDs="
-				+ ticketChargeIDs + ", tickets=" + tickets + ", seatIDs=" + seatIDs + "]";
+				+ screens + ", showDetails=" + showDetails + ", movies=" + movies + ", tickets=" + ticket + "]";
 	}
+
+	
 	
 	
 }

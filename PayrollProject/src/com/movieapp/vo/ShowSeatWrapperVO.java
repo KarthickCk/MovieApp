@@ -25,11 +25,11 @@ public class ShowSeatWrapperVO
 		return "ShowSeatWrapperVO [showSeats=" + showSeats + ", seats=" + seats + ", categories=" + categories + "]";
 	}
 
-	public ArrayList<ShowSeat> getShowSeats() {
+	public ArrayList<ShowSeat> getShowseats() {
 		return showSeats;
 	}
 	
-	public void setShowSeats(ArrayList<ShowSeat> showSeats) {
+	public void setShowseats(ArrayList<ShowSeat> showSeats) {
 		this.showSeats = showSeats;
 	}
 	

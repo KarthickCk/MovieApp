@@ -12,11 +12,11 @@ public class ScreenSeatsVO
 	private ArrayList<Seat> seats=new ArrayList<>();
 	private ArrayList<Category> categorys=new ArrayList<>();
 
-	public ArrayList<Category> getCategorys() {
+	public ArrayList<Category> getCategories() {
 		return categorys;
 	}
 
-	public void setCategorys(ArrayList<Category> categorys) {
+	public void setCategories(ArrayList<Category> categorys) {
 		this.categorys = categorys;
 	}
 

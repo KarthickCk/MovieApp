@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.movieapp.bean.MovieShow;
 
-public class MovieShowWapperBean 
+public class MovieShowsWapperBean 
 {
 	private List<MovieShow> movieShows;
 

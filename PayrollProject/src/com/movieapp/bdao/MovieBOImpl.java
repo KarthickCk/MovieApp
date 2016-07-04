@@ -38,8 +38,9 @@ import com.movieapp.vo.MovieShowWrapperVO;
 import com.movieapp.vo.ScreenSeatsVO;
 import com.movieapp.vo.ShowSeatWrapperVO;
 import com.movieapp.vo.TicketWrapperVO;
-import com.movieapp.wrapperbean.MovieShowWapperBean;
+import com.movieapp.wrapperbean.MovieShowsWapperBean;
 import com.movieapp.wrapperbean.ScreenWrapper;
+import com.movieapp.wrapperbean.TicketAddingWrapperBean;
 
 public class MovieBOImpl implements MovieBO
 {
@@ -129,46 +130,6 @@ public class MovieBOImpl implements MovieBO
 		customer.setPhoneNumber("9790198648");
 		customer.setEmail("admin@zohocorp.com");
 		return customer;
-	}
-
-	private Ticket getTicket(String ticketString)
-	{
-		Ticket ticket=new Ticket();
-		try
-		{
-			JSONObject ticketJson=new JSONObject(ticketString);
-			float ticketCost=Float.parseFloat(ticketJson.optString("totalCost"));
-			long movieShowID=Long.parseLong(ticketJson.optString("movieShowID"));
-			long customerID=Long.parseLong(ticketJson.optString("customerID"));
-			ticket.setTotalCost(ticketCost);
-			ticket.setMovieShowID(movieShowID);
-			ticket.setCustomerID(customerID);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return ticket;
-
-	}
-
-	private TicketCharge getTicketCharge(JSONObject extraJson,long ticketID)
-	{
-		TicketCharge ticketCharge=new TicketCharge();
-		try
-		{
-			long extraID=Long.parseLong(extraJson.optString("extraID"));
-			int quantity=Integer.parseInt(extraJson.optString("quantity"));
-			ticketCharge.setTicketID(ticketID);
-			ticketCharge.setQuantity(quantity);
-			ticketCharge.setExtraID(extraID);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		return ticketCharge;
-
 	}
 
 	private ArrayList<String> getMovieShowsColumnsToFilter(ArrayList<String> columns)
@@ -358,16 +319,16 @@ public class MovieBOImpl implements MovieBO
 	}
 
 	@Override
-	public TicketWrapperVO addTicket(String ticket) 
+	public TicketWrapperVO addTicket(TicketAddingWrapperBean ticketAddingWrapperBean) 
 	{
 		long ticketID=0;
 		try 
 		{
 			DataAccess.getTransactionManager().begin();
-			Ticket ticketData=MovieDAOFactory.getTicketDAO().insert(getTicket(ticket));
-			ticketID=ticketData.getId();
-			updateSeatID(ticket, ticketID);
-			addTicketCharge(ticket, ticketID);
+			Ticket ticket=MovieDAOFactory.getTicketDAO().insert(ticketAddingWrapperBean.getTicket());
+			ticketID=ticket.getId();
+			updateSeatID(ticketAddingWrapperBean, ticketID);
+			addTicketCharge(ticketAddingWrapperBean, ticketID);
 			DataAccess.getTransactionManager().commit();
 		} 
 		catch (Exception e) 
@@ -392,21 +353,20 @@ public class MovieBOImpl implements MovieBO
 		}
 	}
 
-	private void updateSeatID(String ticket,long ticketID) throws UserException, JSONException, DataAccessException
+	private void updateSeatID(TicketAddingWrapperBean ticketAddingWrapperBean,long ticketID) throws UserException, JSONException, DataAccessException
 	{
 
-		JSONObject ticketObject=new JSONObject(ticket);
-		JSONArray seats=ticketObject.optJSONArray("showseats");
-		int length=seats.length();
+		ArrayList<String> showSeatIDs=(ArrayList<String>) ticketAddingWrapperBean.getShowseats();
+		int size=showSeatIDs.size();
 		ShowSeatDAOImpl seatDAOImpl=new ShowSeatDAOImpl();
 		ArrayList<String> criteriaColumns=new ArrayList<>();
 		criteriaColumns.add(DBConstants.SHOW_SEAT_ID);
 		criteriaColumns.add(DBConstants.SS_TICKET_ID);
 		seatDAOImpl.setCriteriaColumnNames(criteriaColumns);
-		for(int i=0;i<length;i++)
+		for(int i=0;i<size;i++)
 		{
 			ArrayList<String> criteriaValues=new ArrayList<>();
-			criteriaValues.add(seats.optString(i));
+			criteriaValues.add(showSeatIDs.get(i));
 			criteriaValues.add("0");
 			seatDAOImpl.setCriteriaValues(criteriaValues);
 			int count=seatDAOImpl.updateSeatCount(String.valueOf(ticketID));
@@ -418,17 +378,17 @@ public class MovieBOImpl implements MovieBO
 
 	}
 
-	private void addTicketCharge(String data,long ticketID)
+	private void addTicketCharge(TicketAddingWrapperBean ticketAddingWrapperBean,long ticketID)
 	{
 		try
 		{
-			JSONObject jsonObject=new JSONObject(data);
-			JSONArray ticketCharge=jsonObject.optJSONArray("ticketcharges");
-			int length=ticketCharge.length();
-			for(int i=0;i<length;i++)
+			ArrayList<TicketCharge> ticketCharges=(ArrayList<TicketCharge>) ticketAddingWrapperBean.getTicketcharges();
+			int size=ticketCharges.size();
+			for(int i=0;i<size;i++)
 			{
-				JSONObject ticketChargeObject=(JSONObject) ticketCharge.get(i);
-				MovieDAOFactory.getTicketChargeDAO().insert(getTicketCharge(ticketChargeObject, ticketID));
+				TicketCharge ticketCharge=ticketCharges.get(i);
+				ticketCharge.setTicketID(ticketID);
+				MovieDAOFactory.getTicketChargeDAO().insert(ticketCharge);
 			}
 		}
 		catch(Exception e)
@@ -567,10 +527,10 @@ public class MovieBOImpl implements MovieBO
 	}
 
 	@Override
-	public Customer getCustomer(String mailID) 
+	public Customer getCustomer(String mailID,String criteriaColumn) 
 	{
 		ArrayList<String> criteriaColumns=new ArrayList<>();
-		criteriaColumns.add(DBConstants.CUSTOMER_EMAIL);
+		criteriaColumns.add(criteriaColumn);
 		ArrayList<String> criteriaValues=new ArrayList<>();
 		criteriaValues.add(mailID);
 
@@ -595,7 +555,7 @@ public class MovieBOImpl implements MovieBO
 	}
 
 	@Override
-	public MovieShow addMovieshow(MovieShowWapperBean movieShowWapperBean) 
+	public MovieShow addMovieshow(MovieShowsWapperBean movieShowWapperBean) 
 	{
 		addMovieShows(movieShowWapperBean.getMovieshows());
 		return null;

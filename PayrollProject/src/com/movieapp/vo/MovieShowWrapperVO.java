@@ -9,60 +9,62 @@ import com.movieapp.bean.ShowDetail;
 
 public class MovieShowWrapperVO 
 {
-	private ArrayList<Movie> movieList=new ArrayList<>();
-	private ArrayList<ShowDetail> showList=new ArrayList<>();
-	private ArrayList<Screen> screenList=new ArrayList<>();
-	private ArrayList<MovieShow> movieShowList=new ArrayList<>();
+	private ArrayList<Movie> movies=new ArrayList<>();
+	private ArrayList<ShowDetail> shows=new ArrayList<>();
+	private ArrayList<Screen> screens=new ArrayList<>();
+	private ArrayList<MovieShow> movieShows=new ArrayList<>();
 
-	public ArrayList<Movie> getMovieList() {
-		return movieList;
+	public ArrayList<Movie> getMovies() {
+		return movies;
 	}
-	
-	public void setMovieList(ArrayList<Movie> movieList) {
-		this.movieList = movieList;
+
+	public void setMovies(ArrayList<Movie> movies) {
+		this.movies = movies;
 	}
-	
-	public ArrayList<ShowDetail> getShowList() {
-		return showList;
+
+	public ArrayList<ShowDetail> getShows() {
+		return shows;
 	}
-	
-	public void setShowList(ArrayList<ShowDetail> showList) {
-		this.showList = showList;
+
+	public void setShows(ArrayList<ShowDetail> shows) {
+		this.shows = shows;
 	}
-	
-	public ArrayList<Screen> getScreenList() {
-		return screenList;
+
+	public ArrayList<Screen> getScreens() {
+		return screens;
 	}
-	
-	public void setScreenList(ArrayList<Screen> screenList) {
-		this.screenList = screenList;
+
+	public void setScreens(ArrayList<Screen> screens) {
+		this.screens = screens;
 	}
-	public ArrayList<MovieShow> getMovieShowList() {
-		return movieShowList;
+
+	public ArrayList<MovieShow> getMovieshows() {
+		return movieShows;
 	}
-	public void setMovieShowList(ArrayList<MovieShow> movieShowList) {
-		this.movieShowList = movieShowList;
+
+	public void setMovieshows(ArrayList<MovieShow> movieShows) {
+		this.movieShows = movieShows;
 	}
-	
+
 	public boolean isMovieAdded(Movie movie)
 	{
-		return movieList.contains(movie);
+		return movies.contains(movie);
 	}
 	
 	public boolean isShowAdded(ShowDetail showDetail)
 	{
-		return showList.contains(showDetail);
+		return shows.contains(showDetail);
 	}
 	
 	public boolean isSCreenAdded(Screen screen)
 	{
-		return screenList.contains(screen);
+		return screens.contains(screen);
 	}
 	
 	@Override
 	public String toString() {
-		return "MovieShowWrapperVO [movieList=" + movieList + ", showList=" + showList + ", screenList=" + screenList
-				+ ", movieShowList=" + movieShowList + "]";
+		return "MovieShowWrapperVO [movieList=" + movies + ", showList=" + shows + ", screenList=" + screens
+				+ ", movieShowList=" + movieShows + "]";
 	}
 
 }

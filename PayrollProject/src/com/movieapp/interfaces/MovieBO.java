@@ -14,8 +14,9 @@ import com.movieapp.bean.ShowDetail;
 import com.movieapp.bean.ShowSeat;
 import com.movieapp.vo.MovieShowWrapperVO;
 import com.movieapp.vo.TicketWrapperVO;
-import com.movieapp.wrapperbean.MovieShowWapperBean;
+import com.movieapp.wrapperbean.MovieShowsWapperBean;
 import com.movieapp.wrapperbean.ScreenWrapper;
+import com.movieapp.wrapperbean.TicketAddingWrapperBean;
 
 public interface MovieBO 
 {
@@ -30,7 +31,7 @@ public interface MovieBO
 	public Screen addScreen(ScreenWrapper screenWrapper);
 	public Screen getScreen(String id);
 
-	public MovieShow addMovieshow(MovieShowWapperBean movieShowWapperBean);
+	public MovieShow addMovieshow(MovieShowsWapperBean movieShowWapperBean);
 	public MovieShowWrapperVO getMovieShowDetails(ArrayList<String> columns,ArrayList<String> values);
 
 	public Category addCategory(Category category);
@@ -41,13 +42,13 @@ public interface MovieBO
 	public Extra getExtra(String id);
 
 	public Customer addCustomer(Customer customer);
-	public Customer getCustomer(String mailID);
+	public Customer getCustomer(String mailID,String criteriaColumn);
 	
 	public Seat getSeat(String id);
 	
 	public ShowSeat getShowSeat(String id);
 	
-	public TicketWrapperVO addTicket(String ticket);
+	public TicketWrapperVO addTicket(TicketAddingWrapperBean ticketAddingWrapperBean);
 	public TicketWrapperVO getBookedTicketProperties(String id);
 
 }
